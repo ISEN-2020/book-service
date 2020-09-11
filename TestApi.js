@@ -1,5 +1,13 @@
-require('./BookManager.js');
+const pg = require('pg');
 
+//Definition of function connect
+function connect(){
+  var connectionString = "postgres://userName:password@serverName/ip:port/nameOfDatabase";
+  //Client for postgres db
+  var pgClient = new pg.Client(connectionString);
+  //Connect to db
+  pgClient.connect();
+}
 
 function getBook(id) {
   request = "SELECT Name from Book_list where ID = '";
@@ -11,14 +19,33 @@ function getBook(id) {
   return result.addRow(row);
   });
 }
-//Connect to the database
-function connect(){
- connectionString = "postgres://userName:password@serverName/ip:port/nameOfDatabase";
-  //Client for postgres db
- pgClient = new pg.Client(connectionString);
-  //Connect to db
- pgClient.connect();
+
+//Definition of function addBook
+function addBook(title, author, type, publish_date, Available, quantity, who_borrowed) {
+  request = "INSERT INTO Book_list (Name, Author, Type, publish_date, Available, quantity, who_borrowed) values (title, Name, Type, publish_date, available, quantity, who_borrowed)";
+  var query = pgClient.query(request , (err, res)=> {
+    if (err) {
+        console.error(err);
+        return;
+    }
+    console.log('Book added successfully');
+    client.end();
+});
 }
+
+//Definition of function deleteBook
+function deleteBook(title, author) {
+  request = "DELETE FROM Book_list WHERE title= title and author= author";
+  var query = pgClient.query(request , (err, res)=> {
+    if (err) {
+        console.error(err);
+        return;
+    }
+    console.log('Book deleted successfully');
+    client.end();
+});
+}
+
 
 var express = require('express');
 // Nous définissons ici les paramètres du serveur.
@@ -29,24 +56,29 @@ var app = express();
 //Afin de faciliter le routage (les URL que nous souhaitons prendre en charge dans notre API), nous créons un objet Router.
 //C'est à partir de cet objet myRouter, que nous allons implémenter les méthodes.
 var myRouter = express.Router();
- myRouter.route('/Books')
-// J'implémente les méthodes GET, PUT, UPDATE et DELETE
-// GET
+
+myRouter.route('/Book')
 .get(function(req,res){
-	  res.json({message : "Display book list (json format)", methode : req.method});
-    connect();
+      res.json({message : "List all books", methode : req.method});
+      connect();
+      getBook();
 })
-//POST
+
 .post(function(req,res){
-      res.json({message : "Ajoute une nouvelle piscine à la liste", methode : req.method});
+      res.json({message : "Add book", methode : req.method});
+      connect();
+      addBook();
 })
-//PUT
+
 .put(function(req,res){
-      res.json({message : "Mise à jour des informations d'une piscine dans la liste", methode : req.method});
+      res.json({message : "Update book", methode : req.method});
+      connect();
 })
-//DELETE
+
 .delete(function(req,res){
-res.json({message : "Suppression d'une piscine dans la liste", methode : req.method});
+	  res.json({message : "Delete Book", methode : req.method});
+    connect();
+    deleteBook();
 });
 
 // Nous demandons à l'application d'utiliser notre routeur
