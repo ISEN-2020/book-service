@@ -3,9 +3,10 @@
 //import Express from "express";
 
 //var query = pgClient.query("SELECT ID from Book_list where name = 'customername'");
-
+var pgClient;
+var connectionString;
 //object used to store and output data to the UI.
-function BookManager(id,title,author,type,publishDate,Available,quantity,whoBorrowed){
+function Books(id,title,author,type,publishDate,Available,quantity,whoBorrowed){
   this.id = id;
   this.title = title;
   this.author = author
@@ -14,16 +15,22 @@ function BookManager(id,title,author,type,publishDate,Available,quantity,whoBorr
   this.Available = Available ;
   this.quantity = quantity;
   this.whoBorrowed = whoBorrowed;
+
+
+}
+
+function test(){
+console.log("chdkd,lf");
+
 }
 
 
-
 function connect(){
-  var connectionString = "postgres://userName:password@serverName/ip:port/nameOfDatabase";
+ connectionString = "postgres://userName:password@serverName/ip:port/nameOfDatabase";
   //Client for postgres db
-  var pgClient = new pg.Client(connectionString);
+ pgClient = new pg.Client(connectionString);
   //Connect to db
-  pgClient.connect();
+ pgClient.connect();
 }
 //Retrieve a book by searching for his ID
 function getBook(id) {
@@ -49,4 +56,13 @@ function isAvailable(name){
        return False;
      }
     });
+}
+
+function getBooks(){
+  request = "Select * from Book_list";
+  var query = pgClient.query(request);
+  query.on("row",function(row,result){
+    result.addRow(row);
+    console.log(result[0]);
+  });
 }
