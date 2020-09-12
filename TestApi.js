@@ -1,16 +1,17 @@
-const pg = require('pg');
+var pg = require("pg");
 
 //Definition of function connect
 function connect(){
-  var connectionString = "postgres://userName:password@serverName/ip:port/nameOfDatabase";
-  //Client for postgres db
+  var connectionString = "postgres://user:password@localhost:port/database";
+
   var pgClient = new pg.Client(connectionString);
-  //Connect to db
-  pgClient.connect();
+  pgClient
+   .connect()
+   .then(() => console.log('connected'));
 }
 
 function getBook(id) {
-  request = "SELECT Name from Book_list where ID = '";
+  request = "SELECT Name from book_list where ID = '";
   request2  = request.concat(id,"");
   StringRequest = request2.concat("","'");
   var query = pgClient.query(StringRequest);
@@ -22,7 +23,7 @@ function getBook(id) {
 
 //Definition of function addBook
 function addBook(title, author, type, publish_date, Available, quantity, who_borrowed) {
-  request = "INSERT INTO Book_list (Name, Author, Type, publish_date, Available, quantity, who_borrowed) values (title, Name, Type, publish_date, available, quantity, who_borrowed)";
+  request = "INSERT INTO book_list (Name, Author, Type, publish_date, Available, quantity) values (title, Name, Type, publish_date, available, quantity)";
   var query = pgClient.query(request , (err, res)=> {
     if (err) {
         console.error(err);
@@ -35,7 +36,7 @@ function addBook(title, author, type, publish_date, Available, quantity, who_bor
 
 //Definition of function deleteBook
 function deleteBook(title, author) {
-  request = "DELETE FROM Book_list WHERE title= title and author= author";
+  request = "DELETE FROM book_list WHERE title= title and author= author";
   var query = pgClient.query(request , (err, res)=> {
     if (err) {
         console.error(err);
@@ -57,7 +58,7 @@ var app = express();
 //C'est à partir de cet objet myRouter, que nous allons implémenter les méthodes.
 var myRouter = express.Router();
 
-myRouter.route('/Book')
+myRouter.route('/book')
 .get(function(req,res){
       res.json({message : "List all books", methode : req.method});
       connect();
