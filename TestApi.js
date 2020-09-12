@@ -1,40 +1,42 @@
 //Definition of function connect
 function connect(){
 const pg = require('pg');
-var connectionString = "postgres://user:password@localhost:port/nameofdatabase";
+var connectionString = "postgres://userName:password@serverName/ip:port/nameOfDatabase";
+//Client for postgres db
+var pgClient = new pg.Client(connectionString);
 
 //Definition of function connect
 function connect(){
-  //Client for postgres db
-  var pgClient = new pg.Client(connectionString);
   pgClient
    .connect()
    .then(() => console.log('connected'));
 }
 
-function getBook(id) {
-  request = "SELECT Name from book_list where ID = '";
-  request2  = request.concat(id,"");
-  StringRequest = request2.concat("","'");
-  var query = pgClient.query(StringRequest);
-  query.on("row", function(row,result){
-
-  return result.addRow(row);
-  });
+function getBooks(){
+  request = "Select * from Book_list";
+  var query = pgClient.query(request)
+  .then(res => {
+    const data = res.rows;
+   console.log('all data');
+   data.forEach(row => {
+       console.log(`Id: ${row.ID} Name: ${row.Name} Author: ${row.Author} Type: ${row.Type} Publish date: ${row.Publish_date} Available: ${row.Available} Quantity: ${row.Quantity}`);
+   })
+ });
 }
 
 //Definition of function addBook
-function addBook(title, author, type, publish_date, Available, quantity, who_borrowed) {
-  request = "INSERT INTO book_list (Name, Author, Type, publish_date, Available, quantity) values (title, Name, Type, publish_date, available, quantity)";
-  var query = pgClient.query(request , (err, res)=> {
-    if (err) {
-        console.error(err);
-        return;
-    }
-    console.log('Book added successfully');
-    client.end();
-});
-}
+function addBook(id ,title, author, type, publish_date, available, quantity) {
+   request = 'INSERT INTO book_list VALUES ( ' + id + ', ' + title + ', ' + author + ', ' + type + ', ' + publish_date + ', ' + available + ', ' + quantity + ')';
+   var query = pgClient.query(request , (err, res)=> {
+     if (err) {
+         console.error(err);
+         return;
+     }
+     console.log('Book added successfully');
+     client.end();
+ });
+ }
+
 
 function updateBook(id, title, author, type, publish_date, available, quantity)
 {
@@ -84,7 +86,7 @@ myRouter.route('/book')
 .get(function(req,res){
       res.json({message : "List all books", methode : req.method});
       connect();
-      getBook();
+      getBooks();
 })
 
 .post(function(req,res){
