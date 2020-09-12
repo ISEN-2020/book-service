@@ -1,8 +1,8 @@
 const pg = require('pg');
+var connectionString = "postgres://userName:password@serverName/ip:port/nameOfDatabase";
 
 //Definition of function connect
 function connect(){
-  var connectionString = "postgres://userName:password@serverName/ip:port/nameOfDatabase";
   //Client for postgres db
   var pgClient = new pg.Client(connectionString);
   //Connect to db
@@ -31,6 +31,26 @@ function addBook(title, author, type, publish_date, Available, quantity, who_bor
     console.log('Book added successfully');
     client.end();
 });
+}
+
+function updateBook(id, title, author, type, publish_date, available, quantity)
+{
+  getBook(id);
+
+  const Sequelize = require('sequelize');
+  sequelize = new Sequelize(connectionString);
+
+  let bookLst = sequelize.define('book_list')
+  let id = await bookLst.update({
+    Name: title,
+    Author: author,
+    Type: type,
+    Publish_date: publish_date,
+    Available: available,
+    Quantity, quantity }
+    { where: { ID: id } }).then(console.log('book id: ' + id + ' is updated.'));
+
+  sequelize.close();
 }
 
 //Definition of function deleteBook
@@ -76,9 +96,14 @@ myRouter.route('/Book')
 })
 
 .delete(function(req,res){
-	  res.json({message : "Delete Book", methode : req.method});
+    res.json({message : "Delete Book", methode : req.method});
     connect();
     deleteBook();
+});
+
+.update(function(req,res){
+    res.json({message : "Update book", methode : req.nethod});
+    updateBook();
 });
 
 // Nous demandons à l'application d'utiliser notre routeur
