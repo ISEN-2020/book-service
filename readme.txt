@@ -30,6 +30,8 @@ Once the container is launched, you can verify its running state by using the co
 Now, to access to your Postgresql server, you may run the following command to open a TTY shell through it whith this command : 
 
 				docker exec -it my_postgres psql -U admin
+If you are on Windows, you should  prefix the command by a 'winpty' statement like the following :
+				winpty docker exec -it my_postgres psql -U admin
 
 According to the previous given values :
 
