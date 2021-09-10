@@ -38,7 +38,7 @@ jobs:
           with:
             image-ref: 'docker.io/isenitii2021/book-service:latest'
             format: 'template'
-            exit-code: '1'
+            exit-code: '0'
             ignore-unfixed: true
             vuln-type: 'os,library'
             severity: 'CRITICAL,HIGH'
