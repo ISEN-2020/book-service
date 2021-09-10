@@ -24,7 +24,7 @@ function tryConnect()
 	});
 }
 
- function getBooks()
+function getBooks()
  {
 	request = "SELECT * FROM Book_list";
    
