@@ -19,9 +19,7 @@ function Books(id,title,author,type,publishDate,Available,quantity,whoBorrowed){
 
 function test(){
 console.log("chdkd,lf");
-
 }
-
 
 function connect(){
  connectionString = "postgres://userName:password@serverName/ip:port/nameOfDatabase";
