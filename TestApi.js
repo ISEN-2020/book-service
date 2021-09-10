@@ -4,6 +4,7 @@ const pg = require('pg');
 var connectionString = "postgres://userName:password@serverName/ip:port/nameOfDatabase";
 //Client for postgres db
 var pgClient = new pg.Client(connectionString);
+}
 
 //Definition of function connect
 function connect(){
@@ -45,15 +46,15 @@ function updateBook(id, title, author, type, publish_date, available, quantity)
   const Sequelize = require('sequelize');
   sequelize = new Sequelize(connectionString);
 
-  let bookLst = sequelize.define('book_list')
+  let bookLst = sequelize.define('book_list');
   let id = await bookLst.update({
     Name: title,
     Author: author,
     Type: type,
     Publish_date: publish_date,
     Available: available,
-    Quantity, quantity }
-    { where: { ID: id } }).then(console.log('book id: ' + id + ' is updated.'));
+    Quantity, quantity });
+    ({ where: { ID: id } }).then(console.log('book id: ' + id + ' is updated.'));
 
   sequelize.close();
 }
@@ -104,12 +105,12 @@ myRouter.route('/book')
     res.json({message : "Delete Book", methode : req.method});
     connect();
     deleteBook();
-});
+})
 
 .update(function(req,res){
     res.json({message : "Update book", methode : req.nethod});
     updateBook();
-});
+})
 
 // Nous demandons à l'application d'utiliser notre routeur
 app.use(myRouter);
@@ -117,4 +118,4 @@ app.use(myRouter);
 // Démarrer le serveur
 app.listen(port, hostname, function(){
 	console.log("Mon serveur fonctionne sur http://"+ hostname +":"+port);
-});
+})
