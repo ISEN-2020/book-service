@@ -14,8 +14,8 @@ pgClient
  .then(() => console.log('Request Ok'));
 }
 
-function addBook(id ,title, author, type, publish_date, available, quantity) {
-   request = 'INSERT INTO book_list VALUES ( ' + id + ', ' + title + ', ' + author + ', ' + type + ', ' + publish_date + ', ' + available + ', ' + quantity + ')';
+function addBook(Books) {
+   request = 'INSERT INTO book_list VALUES (' + title + ', ' + author + ', ' + type + ', ' + publish_date + ', ' + available + ', ' + quantity + ')';
    var query = pgClient.query(request , (err, res)=> {
      if (err) {
          console.error(err);
@@ -30,9 +30,10 @@ function addBook(id ,title, author, type, publish_date, available, quantity) {
    request = "Select * from Book_list";
    var query = pgClient.query(request)
    .then(res => {
-     const data = res.rows;
-    data.forEach(row => {
+      const data = res.rows;
+      data.forEach(row => {
         console.log(`Id: ${row.ID} Name: ${row.Name} Author: ${row.Author} Type: ${row.Type} Publish date: ${row.Publish_date} Available: ${row.Available} Quantity: ${row.Quantity}`);
+        client.end();
     })
   });
 }

@@ -18,16 +18,16 @@ function getBooks(){
   var query = pgClient.query(request)
   .then(res => {
     const data = res.rows;
-   console.log('all data');
-   data.forEach(row => {
+    console.log('all data');
+    data.forEach(row => {
        console.log(`Id: ${row.ID} Name: ${row.Name} Author: ${row.Author} Type: ${row.Type} Publish date: ${row.Publish_date} Available: ${row.Available} Quantity: ${row.Quantity}`);
-       //return;
+       client.end();
    })
  });
 }
 
 //Definition of function addBook
-function addBook(title, author, type, publish_date, available, quantity) {
+function addBook(Books) {
    request = 'INSERT INTO book_list VALUES (' + title + ', ' + author + ', ' + type + ', ' + publish_date + ', ' + available + ', ' + quantity + ')';
    var query = pgClient.query(request , (err, res)=> {
      if (err) {
@@ -40,7 +40,7 @@ function addBook(title, author, type, publish_date, available, quantity) {
  }
 
 
-function updateBook(title, author, type, publish_date, available, quantity)
+function updateBook(Books)
 {
   getBook(id);
 
