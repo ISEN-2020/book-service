@@ -12,7 +12,7 @@ jobs:
         - uses: actions/checkout@v2
         - uses: sburris/dependency-check-action@master
           with:
-            Project-Name: book-server
+            Project-Name: book-service
         - name: Archive dependency check reports
           uses: actions/upload-artifact@v1
           with:
@@ -27,12 +27,12 @@ jobs:
             username: ${{ secrets.DOCKER_USERNAME }}
             password: ${{ secrets.DOCKER_PASSWORD }}
             registry: docker.io
-            repository: isen itii 2021/book-service
+            repository: isen-2020/book-service
             tags: latest
         - name: Run Trivy vulnerability scanner
           uses: aquasecurity/trivy-action@master
           with:
-            image-ref: 'docker.io/isen itii 2021/book-service:latest'
+            image-ref: 'docker.io/isen-2020/book-service:latest'
             format: 'table'
             exit-code: '1'
             ignore-unfixed: true
