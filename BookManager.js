@@ -36,7 +36,7 @@ function tryConnect()
 }
 
 //Retrieve a book by searching for his ID
-function getBook(id) 
+function getBook(int id) 
 {
 	request = "SELECT * FROM Book_list where Id = id";
 	connection.query(request, function (err, result, fields) 
@@ -44,11 +44,12 @@ function getBook(id)
 		if(err) 
 			throw err;
 		console.log(result);
+		return result[0];
 	});
 }
 
 //Allows us to check if a book is available or not
-function isAvailable(id)
+function isAvailable(int id)
 {
 	request = "SELECT quantity FROM Book_list where Id = id";
 	connection.query(request, function (err, result, fields) 
@@ -70,5 +71,6 @@ function getBooks()
 		if(err)
 			throw err;
 		console.log(result);
+		return result;
 	});
 }

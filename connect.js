@@ -32,6 +32,7 @@ function getBooks()
 	{
 		if (err) throw err;
 		console.log(result);
+		return result;
 	});
 }
 

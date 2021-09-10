@@ -31,6 +31,7 @@ function getBooks()
 	{
 		if (err) throw err;
 		console.log("Request OK, connection OK");
+		return result;
 	});
 }
 
@@ -45,7 +46,7 @@ function addBook(Books)
 }
 
 
-function updateBook(BookId, Books)
+function updateBook(int BookId, Books)
 {
 	request = "UPDATE book_list SET Book_name = bookname and Author = author and Book_type = booktype and Publish_date = publishDate and Quantity = quantity WHERE Id = BookId"
     connection.query(request, function (err, result) 
@@ -56,7 +57,7 @@ function updateBook(BookId, Books)
 }
 
 //Definition of function deleteBook
-function deleteBook(id)
+function deleteBook(int id)
 {
 	request = "DELETE FROM book_list WHERE ID = id";
 	connection.query(request, function (err, result)
