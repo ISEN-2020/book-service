@@ -12,7 +12,7 @@ jobs:
         - uses: actions/checkout@v2
         - uses: sburris/dependency-check-action@master
           with:
-            Project-Name: WebServer
+            Project-Name: book-server
         - name: Archive dependency check reports
           uses: actions/upload-artifact@v1
           with:
