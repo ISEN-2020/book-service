@@ -27,12 +27,12 @@ jobs:
             username: ${{ secrets.DOCKER_USERNAME }}
             password: ${{ secrets.DOCKER_PASSWORD }}
             registry: docker.io
-            repository: isen-2020/book-service
+            repository: isenitii2021/book-service
             tags: latest
         - name: Run Trivy vulnerability scanner
           uses: aquasecurity/trivy-action@master
           with:
-            image-ref: 'docker.io/isen-2020/book-service:latest'
+            image-ref: 'docker.io/isenitii2021/book-service:latest'
             format: 'table'
             exit-code: '1'
             ignore-unfixed: true
