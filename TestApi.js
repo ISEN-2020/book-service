@@ -26,8 +26,8 @@ function getBooks(){
 }
 
 //Definition of function addBook
-function addBook(id ,title, author, type, publish_date, available, quantity) {
-   request = 'INSERT INTO book_list VALUES ( ' + id + ', ' + title + ', ' + author + ', ' + type + ', ' + publish_date + ', ' + available + ', ' + quantity + ')';
+function addBook(title, author, type, publish_date, available, quantity) {
+   request = 'INSERT INTO book_list VALUES (' + title + ', ' + author + ', ' + type + ', ' + publish_date + ', ' + available + ', ' + quantity + ')';
    var query = pgClient.query(request , (err, res)=> {
      if (err) {
          console.error(err);
@@ -39,7 +39,7 @@ function addBook(id ,title, author, type, publish_date, available, quantity) {
  }
 
 
-function updateBook(id, title, author, type, publish_date, available, quantity)
+function updateBook(title, author, type, publish_date, available, quantity)
 {
   getBook(id);
 
@@ -54,14 +54,12 @@ function updateBook(id, title, author, type, publish_date, available, quantity)
     Publish_date: publish_date,
     Available: available,
     Quantity, quantity });
-    ({ where: { ID: id } }).then(console.log('book id: ' + id + ' is updated.'));
-
   sequelize.close();
 }
 
 //Definition of function deleteBook
-function deleteBook(title, author) {
-  request = "DELETE FROM book_list WHERE title= title and author= author";
+function deleteBook(id) {
+  request = "DELETE FROM book_list WHERE ID=id";
   var query = pgClient.query(request , (err, res)=> {
     if (err) {
         console.error(err);
