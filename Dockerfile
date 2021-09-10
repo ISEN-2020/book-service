@@ -1,6 +1,6 @@
 FROM node:alpine
 
-LABEL maintainer "nicolas.heissler1@gmail.com"
+LABEL maintainer "lucile.comba-antonetti@isen.yncrea.fr"
 
 ADD BookManager.js connect.js TestApi.js ./
 
