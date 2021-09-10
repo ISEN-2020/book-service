@@ -1,16 +1,14 @@
-CREATE DATABASE library;
+CREATE DATABASE IF NOT EXISTS library;
 \c library;
 
 CREATE TABLE IF NOT EXISTS public.book_list
 (
     "ID" INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    "Name" character varying(120) NOT NULL,
-    "Author" character varying(120) NOT NULL,
-    "Type" character varying(120) NOT NULL,
+    "Name" varchar(255) NOT NULL,
+    "Author" varchar(255) NOT NULL,
+    "Type" varchar(255) NOT NULL,
     "Publish_date" date NOT NULL,
     "Quantity" smallint,
-WITH (
-    OIDS = FALSE
 );
 
 ALTER TABLE public.book_list

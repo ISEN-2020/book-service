@@ -9,8 +9,8 @@ var connectionString;
 function Books(id,title,author,type,publishDate,Available,quantity,whoBorrowed){
   this.id = id;
   this.title = title;
-  this.author = author
-  this.type = type
+  this.author = author;
+  this.type = type;
   this.publishDate = publishDate;
   this.Available = Available ;
   this.quantity = quantity;
