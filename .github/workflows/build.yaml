@@ -6,7 +6,7 @@ on:
         - master
 
 jobs:
-    build:
+    owasp:
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v2
@@ -21,6 +21,10 @@ jobs:
         - name: Install NPM dependencies
           run: |
             npm install --production --unsafe-perm
+    build:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v2        
         - name: build-push
           uses: docker/build-push-action@v1
           with:
@@ -33,11 +37,13 @@ jobs:
           uses: aquasecurity/trivy-action@master
           with:
             image-ref: 'docker.io/isenitii2021/book-service:latest'
-            format: 'table'
+            format: 'template'
             exit-code: '1'
             ignore-unfixed: true
             vuln-type: 'os,library'
             severity: 'CRITICAL,HIGH'
+            template: '@/contrib/sarif.tpl'
+            output: 'trivy-results.sarif'
         - name: Upload Trivy scan results to GitHub Security tab            
           uses: github/codeql-action/upload-sarif@v1
           with:
