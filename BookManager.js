@@ -15,8 +15,6 @@ function Books(id,title,author,type,publishDate,Available,quantity,whoBorrowed){
   this.Available = Available ;
   this.quantity = quantity;
   this.whoBorrowed = whoBorrowed;
-
-
 }
 
 function test(){

@@ -21,6 +21,7 @@ function getBooks(){
    console.log('all data');
    data.forEach(row => {
        console.log(`Id: ${row.ID} Name: ${row.Name} Author: ${row.Author} Type: ${row.Type} Publish date: ${row.Publish_date} Available: ${row.Available} Quantity: ${row.Quantity}`);
+       //return;
    })
  });
 }
