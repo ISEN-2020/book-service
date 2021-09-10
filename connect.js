@@ -1,43 +1,55 @@
-var pg = require("pg");
+var mysql = require('mysql');
 
-var connectionString = "postgres://admin:admin@192.168.99.104:5432/library";
+var connection = mysql.createConnection
+({
+  host: "localhost",
+  user: "root",
+  password: "helloworld",
+  database: "library"
+});
 
-var pgClient = new pg.Client(connectionString);
+connection.connect(function(err) 
+{
+  if (err) throw err;
+  console.log("Connected!");
+});
 
-function connect(){
-
-pgClient
- .connect()
- .then(() => console.log('connected'));
-
- var query = pgClient.query("SELECT * from book_list")
- .then(() => console.log('Request Ok'));
+function tryConnect()
+{
+	request = "SELECT * from book_list"
+	connection.query(request, function (err, result) 
+	{
+		if (err) throw err;
+		console.log("Request OK, connection OK");
+	});
 }
 
-function addBook(Books) {
-   request = 'INSERT INTO book_list VALUES (' + title + ', ' + author + ', ' + type + ', ' + publish_date + ', ' + available + ', ' + quantity + ')';
-   var query = pgClient.query(request , (err, res)=> {
-     if (err) {
-         console.error(err);
-         return;
-     }
-     console.log('Book added successfully');
-     client.end();
- });
- }
-
- function getBooks(){
-   request = "Select * from Book_list";
-   var query = pgClient.query(request)
-   .then(res => {
-      const data = res.rows;
-      data.forEach(row => {
-        console.log(`Id: ${row.ID} Name: ${row.Name} Author: ${row.Author} Type: ${row.Type} Publish date: ${row.Publish_date} Available: ${row.Available} Quantity: ${row.Quantity}`);
-        client.end();
-    })
-  });
+ function getBooks()
+ {
+	request = "SELECT * FROM Book_list";
+   
+	connection.query(request, function (err, result, fields) 
+	{
+		if (err) throw err;
+		console.log(result);
+	});
 }
 
-connect();
+function addBook(Books) 
+{
+   request = INSERT INTO book_list (Book_name,Author,Book_type,Publish_date,Quantity) VALUES (' + book_name + ', ' + author + ', ' + book_type + ', ' + publish_date + ', ' + quantity + ');
+    connection.query(request, function (err, result) 
+	{
+		if (err) throw err;
+		console.log("Request done, the book have been added successfully.");
+	});
+}
+
+// FIRST TRY THE CONNECTION
+tryConnect();
+
+// REQUEST THE BOOK_LIST FROM DATABASE
 getBooks();
-//addBook(1,"sansotta" , "moi", "type", 2020-09-12, "t", 4);
+
+// THEN TRY TO ADD A BOOK IN THE DATABASE
+addBook("Javascript for nerds", "Nobody", "Technical", 2021-09-10, 5);

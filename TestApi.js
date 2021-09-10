@@ -1,76 +1,70 @@
-//Definition of function connect
-function connect(){
-const pg = require('pg');
-var connectionString = "postgres://userName:password@serverName/ip:port/nameOfDatabase";
-//Client for postgres db
-var pgClient = new pg.Client(connectionString);
-}
+var mysql = require('mysql');
 
-//Definition of function connect
-function connect(){
-  pgClient
-   .connect()
-   .then(() => console.log('connected'));
-}
+var connection = mysql.createConnection
+({
+  host: "localhost",
+  user: "root",
+  password: "helloworld",
+  database: "library"
+});
 
-function getBooks(){
-  request = "Select * from Book_list";
-  var query = pgClient.query(request)
-  .then(res => {
-    const data = res.rows;
-    console.log('all data');
-    data.forEach(row => {
-       console.log(`Id: ${row.ID} Name: ${row.Name} Author: ${row.Author} Type: ${row.Type} Publish date: ${row.Publish_date} Available: ${row.Available} Quantity: ${row.Quantity}`);
-       client.end();
-   })
- });
-}
-
-//Definition of function addBook
-function addBook(Books) {
-   request = 'INSERT INTO book_list VALUES (' + title + ', ' + author + ', ' + type + ', ' + publish_date + ', ' + available + ', ' + quantity + ')';
-   var query = pgClient.query(request , (err, res)=> {
-     if (err) {
-         console.error(err);
-         return;
-     }
-     console.log('Book added successfully');
-     client.end();
- });
- }
-
-
-function updateBook(Books)
+connection.connect(function(err) 
 {
-  getBook(id);
+  if (err) throw err;
+  console.log("Connected!");
+});
 
-  const Sequelize = require('sequelize');
-  sequelize = new Sequelize(connectionString);
+function tryConnect()
+{
+ con.query("SELECT * from book_list", function (err, result) 
+ {
+    if (err) throw err;
+    console.log("Request OK, connection OK");
+ });
+}
 
-  let bookLst = sequelize.define('book_list');
-  let id = await bookLst.update({
-    Name: title,
-    Author: author,
-    Type: type,
-    Publish_date: publish_date,
-    Available: available,
-    Quantity, quantity });
-  sequelize.close();
+function getBooks()
+{
+	request = "SELECT * FROM Book_list";
+   
+	connection.query("SELECT * from book_list", function (err, result, fields) 
+	{
+		if (err) throw err;
+		console.log("Request OK, connection OK");
+	});
+}
+
+function addBook(Books) 
+{
+   request = INSERT INTO book_list (Book_name,Author,Book_type,Publish_date,Quantity) VALUES (' + book_name + ', ' + author + ', ' + book_type + ', ' + publish_date + ', ' + quantity + ');
+    connection.query(request, function (err, result) 
+	{
+		if (err) throw err;
+		console.log("Request done, the book have been added successfully.");
+	});
+}
+
+
+function updateBook(BookId, Books)
+{
+	request = "UPDATE book_list SET Book_name = bookname and Author = author and Book_type = booktype and Publish_date = publishDate and Quantity = quantity WHERE Id = BookId"
+    connection.query(request, function (err, result) 
+	{
+		if (err) throw err;
+		console.log("Request done, the book have been successfully updated.");
+	});
 }
 
 //Definition of function deleteBook
-function deleteBook(id) {
-  request = "DELETE FROM book_list WHERE ID=id";
-  var query = pgClient.query(request , (err, res)=> {
-    if (err) {
-        console.error(err);
-        return;
-    }
-    console.log('Book deleted successfully');
-    client.end();
-});
+function deleteBook(id)
+{
+	request = "DELETE FROM book_list WHERE ID = id";
+	connection.query(request, function (err, result)
+	{
+		if (err) throw err;
+		console.log("Request done, the book have been successfully deleted.");
+	});
 }
-
 
 var express = require('express');
 // Nous définissons ici les paramètres du serveur.

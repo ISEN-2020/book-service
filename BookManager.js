@@ -6,15 +6,13 @@
 var pgClient;
 var connectionString;
 //object used to store and output data to the UI.
-function Books(id,title,author,type,publishDate,Available,quantity,whoBorrowed){
+function Books(id,book_name,author,book_type,publishDate,quantity){
   this.id = id;
-  this.title = title;
+  this.book_name = book_name;
   this.author = author;
-  this.type = type;
+  this.book_type = book_type;
   this.publishDate = publishDate;
-  this.Available = Available ;
   this.quantity = quantity;
-  this.whoBorrowed = whoBorrowed;
 }
 
 function test(){
