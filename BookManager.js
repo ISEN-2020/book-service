@@ -1,64 +1,76 @@
+var mysql = require('mysql');
 
-//connection String for the database
-//import Express from "express";
+var connection = mysql.createConnection
+({
+  host: "localhost",
+  user: "root",
+  password: "helloworld",
+  database: "library"
+});
 
-//var query = pgClient.query("SELECT ID from Book_list where name = 'customername'");
-var pgClient;
-var connectionString;
+connection.connect(function(err) 
+{
+  if (err) throw err;
+  console.log("Connected!");
+});
+
 //object used to store and output data to the UI.
-function Books(id,title,author,type,publishDate,Available,quantity,whoBorrowed){
+function Books(id,book_name,author,book_type,publishDate,quantity){
   this.id = id;
-  this.title = title;
+  this.bookname = book_name;
   this.author = author;
-  this.type = type;
+  this.booktype = book_type;
   this.publishDate = publishDate;
-  this.Available = Available ;
   this.quantity = quantity;
-  this.whoBorrowed = whoBorrowed;
 }
 
-function test(){
-console.log("chdkd,lf");
+function tryConnect()
+{
+	request = "SELECT * from book_list"
+	connection.query(request, function (err, result) 
+	{
+		if(err)
+			throw err;
+		console.log("Request OK, connection OK");
+	});
 }
 
-function connect(){
- connectionString = "postgres://userName:password@serverName/ip:port/nameOfDatabase";
-  //Client for postgres db
- pgClient = new pg.Client(connectionString);
-  //Connect to db
- pgClient.connect();
-}
 //Retrieve a book by searching for his ID
-function getBook(id) {
-  request = "SELECT Name from Book_list where ID = '";
-  request2  = request.concat(id,"");
-  StringRequest = request2.concat("","'");
-  var query = pgClient.query(StringRequest);
-  query.on("row", function(row,result){
-  return result.addRow(row);
-  });
-}
-//Allows us to check if a book is available or not
-function isAvailable(name){
-    request = "SELECT Available from Book_list where Name = '";
-    request2  = request.concat(Name,"");
-    StringRequest = request2.concat("","'");
-    var query = pgClient.query(StringRequest);
-    query.on("row", function(row,result){
-      if(result.addRow(row) === True){
-        return True;
-      }
-     else{
-       return False;
-     }
-    });
+function getBook(int id) 
+{
+	request = "SELECT * FROM Book_list where Id = id";
+	connection.query(request, function (err, result, fields) 
+	{
+		if(err) 
+			throw err;
+		console.log(result);
+		return result[0];
+	});
 }
 
-function getBooks(){
-  request = "Select * from Book_list";
-  var query = pgClient.query(request);
-  query.on("row",function(row,result){
-    result.addRow(row);
-    console.log(result[0]);
-  });
+//Allows us to check if a book is available or not
+function isAvailable(int id)
+{
+	request = "SELECT quantity FROM Book_list where Id = id";
+	connection.query(request, function (err, result, fields) 
+	{
+		if(err)
+			throw err;
+		console.log(result);
+		
+		if(result[0].quantity > 0)
+			console.log("The book is available");
+	});
+}
+
+function getBooks()
+{
+	request = "SELECT * FROM Book_list";
+	connection.query(request, function (err, result, fields) 
+	{
+		if(err)
+			throw err;
+		console.log(result);
+		return result;
+	});
 }
