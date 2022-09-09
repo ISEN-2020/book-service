@@ -15,7 +15,7 @@ spec:
         app: webserver
     spec:
       containers:
-      - name: webserver
+      - name: bookservice
         image: bookservice:2.0
         imagePullPolicy: IfNotPresent
         ports:
@@ -24,7 +24,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: webserver-service
+  name: bookservice-service
 spec:
   selector:
     app: webserver

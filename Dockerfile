@@ -2,7 +2,8 @@ FROM node:alpine
 
 LABEL maintainer "lucile.comba-antonetti@isen.yncrea.fr"
 
-ADD index.js ./
+WORKDIR /usr/app
+COPY ./ /usr/app
 
 RUN npm install
 

@@ -2,26 +2,31 @@ var mysql = require('mysql');
 
 var connection = mysql.createConnection
 ({
-  host: "localhost",
+  host: "192.168.43.113:3308",
   user: "root",
   password: "helloworld",
   database: "library"
 });
 
-connection.connect(function(err) 
-{
-  if (err) throw err;
-  console.log("Connected!");
-});
+function connect() {
+	connection.connect(function(err) {
+	if (err) {
+		console.log(err);
+		throw err;
 
-function tryConnect()
-{
- con.query("SELECT * from book_list", function (err, result) 
- {
-    if (err) throw err;
-    console.log("Request OK, connection OK");
- });
+	} else {
+		console.log("Connected!");
+	}});
 }
+
+// function tryConnect()
+// {
+//  con.query("SELECT * from book_list", function (err, result) 
+//  {
+//     if (err) throw err;
+//     console.log("Request OK, connection OK");
+//  });
+// }
 
 function getBooks()
 {
@@ -69,7 +74,7 @@ function deleteBook()
 
 var express = require('express');
 // Nous définissons ici les paramètres du serveur.
-var hostname = 'localhost';
+var hostname = '0.0.0.0';
 var port = 3000;
 // Nous créons un objet de type Express.
 var app = express();
@@ -80,6 +85,7 @@ var myRouter = express.Router();
 myRouter.route('/book')
 .get(function(req,res){
       connect();
+	  
       try {
         resultat = getBooks();
       } catch (err) {
