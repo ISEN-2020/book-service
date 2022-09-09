@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webserver-deployment
+  name: bookservice-deployment
   labels:
     app: webserver
 spec:
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: webserver
-        image: mywebserver:1.0
+        image: bookservice:2.0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000
