@@ -1,45 +1,31 @@
 var mysql = require('mysql2');
 
-var connection = mysql.createConnection
+const connection = mysql.createConnection
 ({
-  host: "192.168.94.34",
+  host: "localhost",
   port: "3308",
   user: "root",
   password: "helloworld",
   database: "library"
 });
 
-function connect() {
-	connection.connect(function(err) {
-		if (err) {
-			console.log(err);
-			throw err;
-
-		} else {
-			console.log("Connected!");
-		}});
+function getBooks() {
+	return new Promise((resolve, reject) => {
+		connection.query(
+			"SELECT name,author,book_type,description,publish_date,quantity FROM book_list",
+			(err, result) => {
+				return err ? reject(err) : resolve(result);
+			}
+		);
+	});
 }
 
+function addBooks(){
+	return new Promise((resolve, rehect) => {
+		connection.query(
 
-// function tryConnect()
-// {
-//  con.query("SELECT * from book_list", function (err, result) 
-//  {
-//     if (err) throw err;
-//     console.log("Request OK, connection OK");
-//  });
-// }
-
-function getBooks()
-{
-	request = "SELECT * FROM Book_list";
-   
-	return connection.query("SELECT * from book_list", function (err, result, fields) 
-	{
-		if (err) throw err;
-		console.log("Request OK, connection OK");
-		return result;
-	});
+		)
+	})
 }
 
 function addBook(book) 
@@ -76,23 +62,27 @@ function deleteBook()
 
 var express = require('express');
 // Nous définissons ici les paramètres du serveur.
+
 var hostname = '0.0.0.0';
 var port = 3000;
+
 // Nous créons un objet de type Express.
 var app = express();
+
 //Afin de faciliter le routage (les URL que nous souhaitons prendre en charge dans notre API), nous créons un objet Router.
 //C'est à partir de cet objet myRouter, que nous allons implémenter les méthodes.
 var myRouter = express.Router();
 
 myRouter.route('/book')
 .get(function(req,res){
-	  connect();
-      try {
-        resultat = getBooks();
-      } catch (err) {
-        resultat = "Erreur lors de la récupération de la liste des livres.";
-      }
-      res.json({message : "List all books", methode : req.method, data: resultat});
+	(async () => {
+		connection.connect();
+		const result = await getBooks();
+		console.log(result);
+		connection.end();
+		res.set('Content-Type', 'application/json');
+		res.status(200).send(result);
+	})();
 })
 
 // .post(function(req,res){
@@ -114,8 +104,6 @@ myRouter.route('/book')
 
 // Nous demandons à l'application d'utiliser notre routeur
 app.use(myRouter);
-
-connect();
 
 // Démarrer le serveur
 app.listen(port, hostname, function(){
