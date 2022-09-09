@@ -2,7 +2,7 @@ var mysql = require('mysql2');
 
 const connection = mysql.createConnection
 ({
-  host: "localhost",
+  host: "192.168.43.113",
   port: "3308",
   user: "root",
   password: "helloworld",
@@ -80,6 +80,7 @@ myRouter.route('/book')
 		const result = await getBooks();
 		console.log(result);
 		connection.end();
+
 		res.set('Content-Type', 'application/json');
 		res.status(200).send(result);
 	})();
