@@ -2,7 +2,7 @@ var mysql = require('mysql2');
 
 const connection = mysql.createConnection
 ({
-  host: "localhost",
+  host: "192.168.94.34",
   port: "3308",
   user: "root",
   password: "helloworld",
@@ -20,22 +20,15 @@ function getBooks() {
 	});
 }
 
-function addBooks(){
-	return new Promise((resolve, rehect) => {
+function addBook(book){
+	return new Promise((resolve, reject) => {
 		connection.query(
-
+			`INSERT INTO book_list (name,author,book_type,description,Publish_date,quantity) VALUES ('${book.name}', '${book.author}', '${book.book_type}','${book.description}', '${book.publishDate}', '${book.quantity}'`,
+			(err,result) => {
+				return err ? reject(err) : resolve(result);
+			}
 		)
 	})
-}
-
-function addBook(book) 
-{
-   request = `INSERT INTO book_list (Book_name,Author,Book_type,Publish_date,Quantity) VALUES ('${book.book_name}', '${book.author}', '${book.book_type}', '${book.publish_date}', '${book.quantity}')`;
-    connection.query(request, function (err, result) 
-	{
-		if (err) throw err;
-		console.log("Request done, the book have been added successfully.");
-	});
 }
 
 
@@ -69,11 +62,14 @@ var port = 3000;
 // Nous créons un objet de type Express.
 var app = express();
 
+app.use(express.json()) // for parsing application/json
+app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+
 //Afin de faciliter le routage (les URL que nous souhaitons prendre en charge dans notre API), nous créons un objet Router.
 //C'est à partir de cet objet myRouter, que nous allons implémenter les méthodes.
 var myRouter = express.Router();
 
-myRouter.route('/book')
+myRouter.route('/getbooks')
 .get(function(req,res){
 	(async () => {
 		connection.connect();
@@ -85,22 +81,20 @@ myRouter.route('/book')
 	})();
 })
 
-// .post(function(req,res){
-//       res.json({message : "Add book", methode : req.method});
-//       connect();
-//       addBook();
-// })
+myRouter.route('/addbook')
+.post(function(req,res,next){
 
-// .put(function(req,res){
-//       res.json({message : "Update book", methode : req.method});
-//       connect();
-// })
+console.log(req.body);
 
-// .delete(function(req,res){
-//     res.json({message : "Delete Book", methode : req.method});
-//     connect();
-//     deleteBook();
-// })
+(async () => {
+	connection.connect();
+	const result = await addBook(req.body.book);
+	console.log("ajout effectué avec succès");
+	connection.end();
+	res.set('Content-Type', 'application/json');
+	res.status(200).send(result);
+	})();
+})
 
 // Nous demandons à l'application d'utiliser notre routeur
 app.use(myRouter);
