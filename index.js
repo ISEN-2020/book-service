@@ -1,8 +1,9 @@
-var mysql = require('mysql');
+var mysql = require('mysql2');
 
 var connection = mysql.createConnection
 ({
-  host: "192.168.43.113:3308",
+  host: "192.168.94.34",
+  port: "3308",
   user: "root",
   password: "helloworld",
   database: "library"
@@ -10,14 +11,15 @@ var connection = mysql.createConnection
 
 function connect() {
 	connection.connect(function(err) {
-	if (err) {
-		console.log(err);
-		throw err;
+		if (err) {
+			console.log(err);
+			throw err;
 
-	} else {
-		console.log("Connected!");
-	}});
+		} else {
+			console.log("Connected!");
+		}});
 }
+
 
 // function tryConnect()
 // {
@@ -84,8 +86,7 @@ var myRouter = express.Router();
 
 myRouter.route('/book')
 .get(function(req,res){
-      connect();
-	  
+	  connect();
       try {
         resultat = getBooks();
       } catch (err) {
@@ -113,6 +114,8 @@ myRouter.route('/book')
 
 // Nous demandons à l'application d'utiliser notre routeur
 app.use(myRouter);
+
+connect();
 
 // Démarrer le serveur
 app.listen(port, hostname, function(){
