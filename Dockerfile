@@ -2,6 +2,9 @@ FROM node:alpine
 
 LABEL maintainer "lucile.comba-antonetti@isen.yncrea.fr"
 
-ADD BookManager.js connect.js TestApi.js ./
+WORKDIR /usr/app
+COPY ./ /usr/app
 
-ENTRYPOINT [ "node", "BookManager.js", "connect.js", "TestApi.js" ]
+RUN npm install
+
+ENTRYPOINT [ "node", "index.js" ]
