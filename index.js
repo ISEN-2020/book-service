@@ -46,6 +46,38 @@ async function getBooks() {
 // Function to add a book to the database
 async function addBook(book) {
 	try {
+async function updateBook(bookId, updatedBook) {
+try {
+	const sql = `
+	UPDATE book_list 
+	SET name = ?, author = ?, book_type = ?, description = ?, publish_date = ?, quantity = ? 
+	WHERE Id = ?`;
+
+	const values = [
+	updatedBook.name,
+	updatedBook.author,
+	updatedBook.book_type,
+	updatedBook.description,
+	updatedBook.publishDate,
+	updatedBook.quantity,
+	bookId
+	];
+
+	const result = await new Promise((resolve, reject) => {
+	connection.query(sql, values, (error, results) => {
+		if (error) {
+		reject(new Error('Error updating book: ' + error.message));
+		} else {
+		resolve(results);
+		}
+	});
+	});
+
+	return result;
+} catch (error) {
+	throw new Error('Error updating book: ' + error.message);
+}
+}
 		const sql = "INSERT INTO book_list (name, author, book_type, description, Publish_date, quantity) VALUES (?, ?, ?, ?, ?, ?)";
 		const values = [book.name, book.author, book.book_type, book.description, book.Publish_date, book.quantity];
 		const result = await new Promise((resolve, reject) => {
@@ -63,6 +95,40 @@ async function addBook(book) {
 	  }
 	}
 
+
+async function updateBook(bookId, updatedBook) {
+	try {
+		const sql = `
+		UPDATE book_list 
+		SET name = ?, author = ?, book_type = ?, description = ?, publish_date = ?, quantity = ? 
+		WHERE Id = ?`;
+	
+		const values = [
+		updatedBook.name,
+		updatedBook.author,
+		updatedBook.book_type,
+		updatedBook.description,
+		updatedBook.publishDate,
+		updatedBook.quantity,
+		bookId
+		];
+	
+		const result = await new Promise((resolve, reject) => {
+		connection.query(sql, values, (error, results) => {
+			if (error) {
+			reject(new Error('Error updating book: ' + error.message));
+			} else {
+			resolve(results);
+			}
+		});
+		});
+	
+		return result;
+	} catch (error) {
+		throw new Error('Error updating book: ' + error.message);
+	}
+	}
+		
 // API endpoint to get books
 app.get('/getbooks', async (req, res) => {
   try {
@@ -83,6 +149,18 @@ app.post('/addbook', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+app.post('/updatebook', async (req, res) => {
+	try {
+	  const bookId = req.body.bookId; // L'identifiant du livre à mettre à jour
+	  const updatedBook = req.body.updatedBook; // Les nouvelles données du livre
+  
+	  const result = await updateBook(bookId, updatedBook);
+	  res.status(200).json(result);
+	} catch (error) {
+	  res.status(500).json({ error: error.message });
+	}
+  });
 
 // Start the server
 const port_serv = 3000;
