@@ -1,5 +1,11 @@
 # Book Service API
 
+# 0. how to use Book Service API
+
+Lauch your images with the command
+ ``docker-compose up``
+Then, enter ``localhost:8080`` in your browser to access the SQL DATABASE
+
 # 1. Create a Docker Compose YAML File for a MySQL Docker Container
 
 Let’s create a directory nammed db-docker at the source of the project, and then create a docker-compose.yaml file in that directory.
@@ -87,7 +93,7 @@ Note: We can’t access the MySQL container through port 3308 in Adminer, as thi
 On the Adminer page, use theses parameters to connect :
 
 	System : MySQL
-	Server : mysql-development (or the name you choosed in the docker-compose.yaml 
+	Server : mysql-development (or the name you choosed in the docker-compose.yaml )
 	Username : root
 	Password : helloworld
 	Database : testapp (or the name you choosed for the DATABASE)
