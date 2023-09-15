@@ -46,38 +46,6 @@ async function getBooks() {
 // Function to add a book to the database
 async function addBook(book) {
 	try {
-async function updateBook(bookId, updatedBook) {
-try {
-	const sql = `
-	UPDATE book_list 
-	SET name = ?, author = ?, book_type = ?, description = ?, publish_date = ?, quantity = ? 
-	WHERE Id = ?`;
-
-	const values = [
-	updatedBook.name,
-	updatedBook.author,
-	updatedBook.book_type,
-	updatedBook.description,
-	updatedBook.publishDate,
-	updatedBook.quantity,
-	bookId
-	];
-
-	const result = await new Promise((resolve, reject) => {
-	connection.query(sql, values, (error, results) => {
-		if (error) {
-		reject(new Error('Error updating book: ' + error.message));
-		} else {
-		resolve(results);
-		}
-	});
-	});
-
-	return result;
-} catch (error) {
-	throw new Error('Error updating book: ' + error.message);
-}
-}
 		const sql = "INSERT INTO book_list (name, author, book_type, description, Publish_date, quantity) VALUES (?, ?, ?, ?, ?, ?)";
 		const values = [book.name, book.author, book.book_type, book.description, book.Publish_date, book.quantity];
 		const result = await new Promise((resolve, reject) => {
@@ -95,24 +63,11 @@ try {
 	  }
 	}
 
-
+// Function to update a book to the database
 async function updateBook(bookId, updatedBook) {
 	try {
-		const sql = `
-		UPDATE book_list 
-		SET name = ?, author = ?, book_type = ?, description = ?, publish_date = ?, quantity = ? 
-		WHERE Id = ?`;
-	
-		const values = [
-		updatedBook.name,
-		updatedBook.author,
-		updatedBook.book_type,
-		updatedBook.description,
-		updatedBook.publishDate,
-		updatedBook.quantity,
-		bookId
-		];
-	
+		const sql = `UPDATE book_list SET name = ?, author = ?, book_type = ?, description = ?, publish_date = ?, quantity = ? WHERE Id = ?`;
+		const values = [updatedBook.name,updatedBook.author,updatedBook.book_type,updatedBook.description,updatedBook.publishDate,updatedBook.quantity,bookId];
 		const result = await new Promise((resolve, reject) => {
 		connection.query(sql, values, (error, results) => {
 			if (error) {
@@ -128,7 +83,8 @@ async function updateBook(bookId, updatedBook) {
 		throw new Error('Error updating book: ' + error.message);
 	}
 	}
-		
+
+
 // API endpoint to get books
 app.get('/getbooks', async (req, res) => {
   try {
