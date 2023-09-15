@@ -4,6 +4,7 @@
 
 Lauch your images with the command
  ``docker-compose up``
+
 Then, enter ``localhost:8080`` in your browser to access the SQL DATABASE. You will see appear a window with some information to specify :
 
 	Serveur : mysql-development
@@ -12,6 +13,13 @@ Then, enter ``localhost:8080`` in your browser to access the SQL DATABASE. You w
 	Base de données : 
 
 When your connected, you have a local DataBase. You can set up by going in the *requête SQL* and apload your information in JSON format.
+
+Think to change the IP SQL address by your local IP address and run your Dockerfile with the following commands :
+
+	docker build -t bookservice:1.0 .
+	docker images
+	docker run  --rm -p 3000:3000 bookservice:1.0
+
 
 Then, to verifie, enter ``http://localhost:3000/getbooks`` in your browser to test a POST requeste
 
