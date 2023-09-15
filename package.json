@@ -2,7 +2,7 @@
     "name": "book-service",
     "version": "2.0.0",
     "description": "Node.js on Docker",
-    "author": "mattecoco and clovis",
+    "author": "Mathilde , Fabio and Ileona",
     "main": "index.js",
     "scripts": {
       "start": "node server.js"
