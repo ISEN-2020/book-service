@@ -32,6 +32,10 @@ Then, to verifie, enter ``http://localhost:3000/getbooks`` in your browser to te
 
 	curl -X POST -H "Content-Type: application/json" -d @updateBook.json http://localhost:3000/updateBook
 
+Test deletebook with : 
+
+	curl -X DELETE http://localhost:3000/deletebook/13
+
 
 
 # 1. Create a Docker Compose YAML File for a MySQL Docker Container
