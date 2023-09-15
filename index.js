@@ -15,7 +15,7 @@ function setUpConnection(host, port, user, password, database) {
 }
 
 // Example usage: set up the connection based on environment variables or other sources
-const host = process.env.DB_HOST  // Use environment variable or default IP
+const host = process.env.DB_HOST || "172.16.246.90";  // Use environment variable or default IP
 const port = process.env.DB_PORT || "3308";  // Use environment variable or default port
 const user = process.env.DB_USER || "root";  // Use environment variable or default user
 const password = process.env.DB_PASSWORD || "helloworld";  // Use environment variable or default password
@@ -28,6 +28,7 @@ setUpConnection(host, port, user, password, database);  // Set up the connection
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.disable("x-powered-by");
 
 // Function to get books from the database
 async function getBooks() {
