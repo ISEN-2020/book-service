@@ -84,6 +84,25 @@ async function updateBook(bookId, updatedBook) {
 	}
 	}
 
+// Function to update a book to the database
+async function deleteBook(bookId) {
+	try {
+		const sql = `DELETE FROM book_list WHERE Id = ?`;
+		const result = await new Promise((resolve, reject) => {
+		connection.query(sql, [bookId], (error, results) => {
+			if (error) {
+			reject(new Error('Error deleting book: ' + error.message));
+			} else {
+			resolve(results);
+			}
+		});
+		});
+	
+		return result;
+	} catch (error) {
+		throw new Error('Error deleting book: ' + error.message);
+	}
+	}
 
 // API endpoint to get books
 app.get('/getbooks', async (req, res) => {
@@ -106,6 +125,7 @@ app.post('/addbook', async (req, res) => {
   }
 });
 
+// API endpoint to Update a book
 app.post('/updatebook', async (req, res) => {
 	try {
 	  const bookId = 12; // L'identifiant du livre à mettre à jour
@@ -113,6 +133,20 @@ app.post('/updatebook', async (req, res) => {
   
 	  const result = await updateBook(bookId, updatedBook);
 	  res.status(200).json(result);
+	} catch (error) {
+	  res.status(500).json({ error: error.message });
+	}
+  });
+
+// API endpoint to delete a book
+app.delete('/deletebook/:id', async (req, res) => {
+	try {
+	  const bookId = req.params.id; // L'identifiant du livre à supprimer
+  
+	  // Appel de la fonction deleteBook
+	  const result = await deleteBook(bookId);
+  
+	  res.status(200).json({ message: 'Book deleted successfully', result });
 	} catch (error) {
 	  res.status(500).json({ error: error.message });
 	}
