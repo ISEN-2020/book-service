@@ -2,6 +2,11 @@
 
 # 0. how to use Book Service API
 
+__IMPORTANT__
+Think to update your environment variable in you computer or tu put your ID adress
+
+***
+
 Lauch your docker-compose with the command
  ``docker-compose up`` in the right folder
 
@@ -23,6 +28,7 @@ Think to change the IP SQL address by your local IP address and run your Dockerf
 
 Then, to verifie, enter ``http://localhost:3000/getbooks`` in your browser to test a POST request
  
+***
 
 ``book.json`` is here to test addbook request with :
 
