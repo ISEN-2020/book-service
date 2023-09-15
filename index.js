@@ -128,7 +128,7 @@ app.post('/addbook', async (req, res) => {
 // API endpoint to Update a book
 app.post('/updatebook', async (req, res) => {
 	try {
-	  const bookId = 12; // L'identifiant du livre à mettre à jour
+	  const bookId = req.body.bookId; // L'identifiant du livre à mettre à jour
 	  const updatedBook = req.body.updatedBook; // Les nouvelles données du livre
   
 	  const result = await updateBook(bookId, updatedBook);
@@ -142,10 +142,8 @@ app.post('/updatebook', async (req, res) => {
 app.delete('/deletebook/:id', async (req, res) => {
 	try {
 	  const bookId = req.params.id; // L'identifiant du livre à supprimer
-  
 	  // Appel de la fonction deleteBook
 	  const result = await deleteBook(bookId);
-  
 	  res.status(200).json({ message: 'Book deleted successfully', result });
 	} catch (error) {
 	  res.status(500).json({ error: error.message });
