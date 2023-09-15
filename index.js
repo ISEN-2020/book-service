@@ -80,5 +80,5 @@ app.post('/addbook', async (req, res) => {
 // Start the server
 const port_serv = 3000;
 app.listen(port_serv, () => {
-  console.log("Server running at http://localhost:" + port);
+  console.log("Server running at http://localhost:" + port_serv);
 });
