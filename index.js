@@ -15,7 +15,7 @@ function setUpConnection(host, port, user, password, database) {
 }
 
 // Example usage: set up the connection based on environment variables or other sources
-const host = process.env.DB_HOST || "192.168.56.1";  // Use environment variable or default IP
+const host = process.env.DB_HOST || "172.16.246.90";  // Use environment variable or default IP
 const port = process.env.DB_PORT || "3308";  // Use environment variable or default port
 const user = process.env.DB_USER || "root";  // Use environment variable or default user
 const password = process.env.DB_PASSWORD || "helloworld";  // Use environment variable or default password
@@ -47,8 +47,8 @@ async function getBooks() {
 // Function to add a book to the database
 async function addBook(book) {
   try {
-    const sql = "INSERT INTO book_list (name, author, book_type, description, publish_date, quantity) VALUES (?, ?, ?, ?, ?, ?)";
-    const values = [book.name, book.author, book.book_type, book.description, book.publishDate, book.quantity];
+    const sql = "INSERT INTO book_list (name, author, book_type, description, Publish_date, quantity) VALUES (?, ?, ?, ?, ?, ?)";
+    const values = [book.name, book.author, book.book_type, book.description, book.Publish_date, book.quantity];
     const [result] = await connection.execute(sql, values);
     return result;
   } catch (error) {
@@ -69,7 +69,7 @@ app.get('/getbooks', async (req, res) => {
 // API endpoint to add a book
 app.post('/addbook', async (req, res) => {
   try {
-    const book = req.body.book;
+    const book = req.body;
     const result = await addBook(book);
     res.status(200).json(result);
   } catch (error) {
@@ -80,5 +80,5 @@ app.post('/addbook', async (req, res) => {
 // Start the server
 const port_serv = 3000;
 app.listen(port_serv, () => {
-  console.log("Server running at http://localhost:" + port);
+  console.log("Server running at http://localhost:" + port_serv);
 });
