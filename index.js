@@ -25,7 +25,6 @@ setUpConnection(host, port, user, password, database);  // Set up the connection
 
 // Rest of your code using the 'connection' variable
 
-
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -46,15 +45,24 @@ async function getBooks() {
 
 // Function to add a book to the database
 async function addBook(book) {
-  try {
-    const sql = "INSERT INTO book_list (name, author, book_type, description, publish_date, quantity) VALUES (?, ?, ?, ?, ?, ?)";
-    const values = [book.name, book.author, book.book_type, book.description, book.publishDate, book.quantity];
-    const [result] = await connection.execute(sql, values);
-    return result;
-  } catch (error) {
-    throw new Error('Error adding book: ' + error.message);
+	try {
+	  const sql = "INSERT INTO book_list (name, author, book_type, description, publish_date, quantity) VALUES (?, ?, ?, ?, ?, ?)";
+	  const values = [book.name, book.author, book.book_type, book.description, book.publishDate, book.quantity];
+	  const result = await new Promise((resolve, reject) => {
+		connection.query(sql, values, (error, results) => {
+		  if (error) {
+			reject(new Error('Error adding book: ' + error.message));
+		  } else {
+			resolve(results);
+		  }
+		});
+	  });
+	  return result;
+	} catch (error) {
+	  throw new Error('Error adding book: ' + error.message);
+	}
   }
-}
+  
 
 // API endpoint to get books
 app.get('/getbooks', async (req, res) => {
