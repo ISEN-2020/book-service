@@ -108,7 +108,7 @@ app.post('/addbook', async (req, res) => {
 
 app.post('/updatebook', async (req, res) => {
 	try {
-	  const bookId = req.body.bookId; // L'identifiant du livre à mettre à jour
+	  const bookId = 12; // L'identifiant du livre à mettre à jour
 	  const updatedBook = req.body.updatedBook; // Les nouvelles données du livre
   
 	  const result = await updateBook(bookId, updatedBook);
