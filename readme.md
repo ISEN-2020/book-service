@@ -4,7 +4,17 @@
 
 Lauch your images with the command
  ``docker-compose up``
-Then, enter ``localhost:8080`` in your browser to access the SQL DATABASE
+Then, enter ``localhost:8080`` in your browser to access the SQL DATABASE. You will see appear a window with some information to specify :
+
+	Serveur : mysql-development
+	Utilisateur : root
+	Mot de passe : helloworld
+	Base de données : 
+
+When your connected, you have a local DataBase. You can set up by going in the *requête SQL* and apload your information in JSON format.
+
+Then, to verifie, enter ``http://localhost:3000/getbooks`` in your browser to test a POST requeste
+
 
 # 1. Create a Docker Compose YAML File for a MySQL Docker Container
 
