@@ -1,6 +1,5 @@
 const mysql = require('mysql2');
 const express = require('express');
-
 let connection;  // Declare the connection variable
 
 // Function to set up the MySQL connection based on provided parameters
@@ -20,11 +19,7 @@ const port = process.env.DB_PORT || "3308";  // Use environment variable or defa
 const user = process.env.DB_USER || "root";  // Use environment variable or default user
 const password = process.env.DB_PASSWORD || "helloworld";  // Use environment variable or default password
 const database = process.env.DB_DATABASE || "library";  // Use environment variable or default database
-
 setUpConnection(host, port, user, password, database);  // Set up the connection
-
-// Rest of your code using the 'connection' variable
-
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
