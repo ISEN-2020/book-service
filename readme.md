@@ -22,9 +22,16 @@ Think to change the IP SQL address by your local IP address and run your Dockerf
 
 
 Then, to verifie, enter ``http://localhost:3000/getbooks`` in your browser to test a POST request
+ 
 
+``book.json`` is here to test addbook request with :
 
-``book.json`` is here to test addbook request
+	curl -X POST -H "Content-Type: application/json" -d @book.json http://localhost:3000/addbook
+
+``updateBook.json`` is here to test updatebook request with :
+
+	curl -X POST -H "Content-Type: application/json" -d @updateBook.json http://localhost:3000/updateBook
+
 
 
 # 1. Create a Docker Compose YAML File for a MySQL Docker Container
