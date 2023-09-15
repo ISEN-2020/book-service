@@ -1,6 +1,10 @@
 FROM node:alpine
 
+RUN adduser -D myuser
+
 LABEL maintainer "eric.muellenbach@yncrea.fr"
+
+USER myuser
 
 WORKDIR /usr/app
 COPY ./ /usr/app
