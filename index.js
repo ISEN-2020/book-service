@@ -66,8 +66,8 @@ async function addBook(book) {
 // Function to update a book to the database
 async function updateBook(bookId, updatedBook) {
 	try {
-		const sql = `UPDATE book_list SET name = ?, author = ?, book_type = ?, description = ?, publish_date = ?, quantity = ? WHERE Id = ?`;
-		const values = [updatedBook.name,updatedBook.author,updatedBook.book_type,updatedBook.description,updatedBook.publishDate,updatedBook.quantity,bookId];
+		const sql = `UPDATE book_list SET name = ?, author = ?, book_type = ?, description = ?, Publish_date = ?, quantity = ? WHERE Id = ?`;
+		const values = [updatedBook.name,updatedBook.author,updatedBook.book_type,updatedBook.description,updatedBook.Publish_date,updatedBook.quantity,bookId];
 		const result = await new Promise((resolve, reject) => {
 		connection.query(sql, values, (error, results) => {
 			if (error) {
