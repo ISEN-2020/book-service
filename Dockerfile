@@ -1,6 +1,6 @@
 FROM node:alpine
 
-LABEL maintainer "lucile.comba-antonetti@isen.yncrea.fr"
+LABEL maintainer "eric.muellenbach@yncrea.fr"
 
 WORKDIR /usr/app
 COPY ./ /usr/app
