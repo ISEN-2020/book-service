@@ -2,8 +2,8 @@
 
 # 0. how to use Book Service API
 
-Lauch your images with the command
- ``docker-compose up``
+Lauch your docker-compose with the command
+ ``docker-compose up`` in the right folder
 
 Then, enter ``localhost:8080`` in your browser to access the SQL DATABASE. You will see appear a window with some information to specify :
 
