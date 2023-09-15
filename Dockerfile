@@ -1,15 +1,17 @@
 FROM node:alpine
 
-RUN adduser -D myuser
+
 
 LABEL maintainer "eric.muellenbach@yncrea.fr"
 
-USER myuser
+
 
 WORKDIR /usr/app
 COPY ./ /usr/app
 
 RUN npm install
+RUN adduser -D myuser
+USER myuser
 
 ENTRYPOINT [ "node", "index.js" ]
 
