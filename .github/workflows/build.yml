@@ -36,11 +36,11 @@ jobs:
  
       # Build the Docker image
       - name: Build Docker image
-        run: docker build -t allanisen/cd:${{ github.sha }} .
+        run: docker build -t allanisen/book-service:${{ github.sha }} .
  
       # Push the Docker image to DockerHub
       - name: Push Docker image
-        run: docker push allanisen/cd:${{ github.sha }}
+        run: docker push allanisen/book-service:${{ github.sha }}
         # tags: latest
   trivy:
     runs-on: ubuntu-latest
@@ -48,7 +48,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@v0.4.0
         with:
-          image-ref: 'allanisen/cd'
+          image-ref: 'allanisen/book-service'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
