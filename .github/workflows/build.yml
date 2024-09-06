@@ -1,0 +1,90 @@
+name: Build and Push Docker Image
+ 
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+ 
+jobs:
+  sonarcloud:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        # Disabling shallow clone is recommended for improving relevancy of reporting
+        fetch-depth: 0
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@v3.0.0 # Ex: v2.1.0, See the latest version at https://github.com/marketplace/actions/sonarcloud-scan
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v2
+ 
+      # Log in to DockerHub using secrets
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+ 
+      # Build the Docker image
+      - name: Build Docker image
+        run: docker build -t allanisen/cd:${{ github.sha }} .
+ 
+      # Push the Docker image to DockerHub
+      - name: Push Docker image
+        run: docker push allanisen/cd:${{ github.sha }}
+        # tags: latest
+  trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.4.0
+        with:
+          image-ref: 'allanisen/cd'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+  generate-sbom:
+    name: Generate SBOM and Build Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Install NPM dependencies
+        run: npm install
+      - name: Generate SBOM for Javascript
+        uses: anchore/sbom-action@v0
+        with:
+          format: json
+          artifact-name: sbom-node-js.json
+      - name: Build Docker Image
+        run: docker build -t my-node-app:latest .
+      - name: Generate SBOM for Docker image
+        uses: anchore/sbom-action@v0
+        with:
+          image: my-node-app:latest
+          format: json
+          artifact-name: sbom-docker-image.json
+      - name: List generated files
+        run: ls -la
+      - name: Upload SBOMs
+        uses: actions/upload-artifact@v3
+        with:
+          name: sbom-artifacts
+          path: |
+            sbom-node-js.json
+            sbom-docker-image.json
