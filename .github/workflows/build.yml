@@ -51,7 +51,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Run Trivy scan
-      uses: aquasecurity/trivy-action@v0.6.0  # Changez cette version en fonction de la version disponible
+      uses: aquasecurity/trivy-action@v0.4.0  # Changez cette version en fonction de la version disponible
       with:
         image-ref: 'bookservice:latest'
       env:
