@@ -3,7 +3,7 @@ const express = require('express');
 const _ = require('lodash');
 
 const app = express();
-const port = 8000;
+const port = 5000;
 
 // A simple route that responds with "Hello, World!"
 app.get('/', (req, res) => {

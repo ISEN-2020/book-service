@@ -11,8 +11,8 @@ RUN pip install -r requirements.txt
 # Copier tout le contenu du projet dans le répertoire de travail
 COPY . .
  
-# Exposer le port 8000 (le port par défaut utilisé par Uvicorn)
-EXPOSE 8000
+# Exposer le port 5000 (le port par défaut utilisé par Uvicorn)
+EXPOSE 5000
  
 # Démarrer l'application avec Uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
