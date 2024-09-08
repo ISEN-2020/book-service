@@ -49,7 +49,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@v0.4.0
         with:
-          image-ref: 'allanisen/book-service'
+          image-ref: 'allanisen/bookservice'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
