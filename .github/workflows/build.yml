@@ -53,7 +53,7 @@ jobs:
     - name: Run Trivy scan
       uses: aquasecurity/trivy-action@v0.6.0  # Changez cette version en fonction de la version disponible
       with:
-        image-ref: 'your-image-name:latest'
+        image-ref: 'bookservice:latest'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   generate-sbom:
