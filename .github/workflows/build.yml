@@ -45,16 +45,17 @@ jobs:
       run: docker logout
   trivy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@v0.4.0
-        with:
-          image-ref: 'allanisen/bookservice'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Run Trivy scan
+      uses: aquasecurity/trivy-action@v0.6.0  # Changez cette version en fonction de la version disponible
+      with:
+        image-ref: 'your-image-name:latest'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   generate-sbom:
     name: Generate SBOM and Build Docker Image
     runs-on: ubuntu-latest
