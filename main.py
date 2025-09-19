@@ -321,4 +321,10 @@ create_table()
 
 # Démarrer l'application Flask en mode développement uniquement si exécuté directement
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Debug must never be enabled in production. Honor FLASK_DEBUG if present; otherwise enable only in dev.
+    _debug_env = os.getenv('FLASK_DEBUG')
+    if _debug_env is None:
+        debug = _env not in ('prod', 'production')
+    else:
+        debug = str(_debug_env).lower() in ('1', 'true', 'yes', 'on')
+    app.run(debug=debug)
