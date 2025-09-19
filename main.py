@@ -12,6 +12,9 @@ CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}})
 # Connexion à la base de données SQLite
 DATABASE = "library.db"
 
+# Messages d'erreur/constants
+ERROR_DB_CONN_MSG = "Impossible de se connecter à la base de données"
+
 def get_db_connection():
     try:
         conn = sqlite3.connect(DATABASE)
@@ -162,7 +165,7 @@ def get_books():
 
         return books_html
     else:
-        return '''
+        return f'''
         <!DOCTYPE html>
         <html lang="fr">
         <head>
@@ -176,7 +179,7 @@ def get_books():
         </head>
         <body>
             <h1>Erreur</h1>
-            <p>Impossible de se connecter à la base de données.</p>
+            <p>{ERROR_DB_CONN_MSG}.</p>
         </body>
         </html>
         ''', 500
@@ -205,7 +208,7 @@ def add_book():
         conn.close()
         return jsonify({"message": "Livre ajouté avec succès"}), 201
     else:
-        return jsonify({"error": "Impossible de se connecter à la base de données"}), 500
+        return jsonify({"error": ERROR_DB_CONN_MSG}), 500
 
 # Endpoint pour modifier un livre (PUT)
 @app.route('/books/<int:id>', methods=['PUT'])
@@ -231,7 +234,7 @@ def update_book(id):
         conn.close()
         return jsonify({"message": "Livre mis à jour avec succès"})
     else:
-        return jsonify({"error": "Impossible de se connecter à la base de données"}), 500
+        return jsonify({"error": ERROR_DB_CONN_MSG}), 500
 
 # Endpoint pour supprimer un livre (DELETE)
 @app.route('/books/<int:id>', methods=['DELETE'])
@@ -243,7 +246,7 @@ def delete_book(id):
         conn.close()
         return jsonify({"message": "Livre supprimé avec succès"})
     else:
-        return jsonify({"error": "Impossible de se connecter à la base de données"}), 500
+        return jsonify({"error": ERROR_DB_CONN_MSG}), 500
 
 # Endpoint pour la documentation
 @app.route('/docs', methods=['GET'])
@@ -302,4 +305,3 @@ create_table()
 # Démarrer l'application Flask en mode développement uniquement si exécuté directement
 if __name__ == '__main__':
     app.run(debug=True)
-    
