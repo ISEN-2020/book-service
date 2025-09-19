@@ -139,6 +139,7 @@ def health():
 
 # Endpoint pour obtenir la liste de tous les livres (GET)
 @app.route('/books', methods=['GET'])
+@app.route('/getBooks', methods=['GET'])  # alias
 def get_books():
     conn = get_db_connection()
     if conn:
@@ -203,6 +204,8 @@ def get_books():
 
 # Endpoint pour ajouter un nouveau livre (POST)
 @app.route('/books', methods=['POST'])
+@app.route('/addBook', methods=['POST'])   # alias
+@app.route('/addBooks', methods=['POST'])  # alias
 def add_book():
     new_book = request.get_json()
 
@@ -229,6 +232,7 @@ def add_book():
 
 # Endpoint pour modifier un livre (PUT)
 @app.route('/books/<int:id>', methods=['PUT'])
+@app.route('/updateBook/<int:id>', methods=['PUT'])  # alias
 def update_book(id):
     updated_book = request.get_json()
 
@@ -255,6 +259,7 @@ def update_book(id):
 
 # Endpoint pour supprimer un livre (DELETE)
 @app.route('/books/<int:id>', methods=['DELETE'])
+@app.route('/deleteBook/<int:id>', methods=['DELETE'])  # alias
 def delete_book(id):
     conn = get_db_connection()
     if conn:
