@@ -93,3 +93,52 @@ On the Adminer page, use theses parameters to connect :
 	Password : helloworld
 	Database : testapp (or the name you choosed for the DATABASE)
 	
+---
+
+## Configuration
+
+To comply with secure coding practices and SonarQube guidance, the Flask app must obtain its secret key from the environment.
+
+- In production, `SECRET_KEY` is mandatory. The app will fail fast if it is missing.
+- In development, if `SECRET_KEY` is not provided, an ephemeral key is generated (or you can set `DEV_SECRET_KEY`).
+
+Recommended ways to set secrets:
+
+- Store them in your platform’s secret manager (GitHub Actions, Docker/Kubernetes secrets, cloud provider KMS/Secret Manager).
+- Never commit secrets to source control.
+
+### Local development (PowerShell)
+
+```powershell
+# Option A: ephemeral (no env var needed) — app prints a warning
+python .\main.py
+
+# Option B: stable dev key
+$env:DEV_SECRET_KEY = "<long-random-value>"
+python .\main.py
+```
+
+### Docker run (production-like)
+
+```bash
+docker run \
+  -e SECRET_KEY="<strong-secret>" \
+  -e FLASK_ENV=production \
+  -p 5000:5000 \
+  docker.io/<user>/book-service:<tag>
+```
+
+### Docker Compose example
+
+```yaml
+services:
+  book-service:
+    image: docker.io/<user>/book-service:latest
+    environment:
+      FLASK_ENV: production
+      SECRET_KEY: ${SECRET_KEY}   # define in .env or your secret manager
+    ports:
+      - "5000:5000"
+```
+
+If you use a `.env` file for Compose, ensure it is not committed to the repository.
