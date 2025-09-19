@@ -28,6 +28,9 @@ CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}})
 
 # Connexion à la base de données SQLite
 DATABASE = "library.db"
+# Fichier JSON contenant des livres d'exemple (chemin absolu pour robustesse)
+_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+JSON_FILE = os.path.join(_BASE_DIR, "livres.json")
 
 # Messages d'erreur/constants
 ERROR_DB_CONN_MSG = "Impossible de se connecter à la base de données"
@@ -40,6 +43,19 @@ def get_db_connection():
     except sqlite3.Error as e:
         print(f"Erreur lors de la connexion à la base de données: {e}")
         return None
+
+def load_books_from_json():
+    """Charge les livres depuis le fichier JSON s'il existe."""
+    try:
+        if os.path.exists(JSON_FILE):
+            import json
+            with open(JSON_FILE, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                if isinstance(data, list):
+                    return data
+    except Exception as e:
+        print(f"Erreur lors du chargement de {JSON_FILE}: {e}")
+    return []
 
 # Créer la table "books" dans SQLite si elle n'existe pas
 def create_table():
@@ -141,12 +157,9 @@ def health():
 @app.route('/books', methods=['GET'])
 @app.route('/getBooks', methods=['GET'])  # alias
 def get_books():
-    conn = get_db_connection()
-    if conn:
-        books = conn.execute('SELECT * FROM books').fetchall()
-        conn.close()
-
-        # Construction de la réponse HTML
+    # 1) Essayer d'afficher depuis le fichier JSON
+    json_books = load_books_from_json()
+    if json_books:
         books_html = '<!DOCTYPE html>'
         books_html += '<html lang="fr">'
         books_html += '<head>'
@@ -163,10 +176,50 @@ def get_books():
         books_html += '</style>'
         books_html += '</head>'
         books_html += '<body>'
-        books_html += '<h1>Liste des Livres</h1>'
+        books_html += '<h1>Liste des Livres (JSON)</h1>'
+        books_html += '<table>'
+        books_html += '<tr><th>Title</th><th>Author</th><th>Year</th><th>Description</th></tr>'
+        for book in json_books:
+            title = book.get('title', '')
+            author = book.get('author', '')
+            year = book.get('year', '')
+            description = book.get('description') or 'No description available'
+            books_html += '<tr>'
+            books_html += f'<td>{title}</td>'
+            books_html += f'<td>{author}</td>'
+            books_html += f'<td>{year}</td>'
+            books_html += f'<td>{description}</td>'
+            books_html += '</tr>'
+        books_html += '</table>'
+        books_html += '</body>'
+        books_html += '</html>'
+        return books_html
+
+    # 2) Sinon, fallback vers la base de données
+    conn = get_db_connection()
+    if conn:
+        books = conn.execute('SELECT * FROM books').fetchall()
+        conn.close()
+
+        books_html = '<!DOCTYPE html>'
+        books_html += '<html lang="fr">'
+        books_html += '<head>'
+        books_html += '<meta charset="UTF-8">'
+        books_html += '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+        books_html += '<title>Liste des Livres</title>'
+        books_html += '<style>'
+        books_html += 'body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; background-color: #f4f4f4; color: #333; }'
+        books_html += 'table { width: 100%; border-collapse: collapse; }'
+        books_html += 'th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }'
+        books_html += 'th { background-color: #0056b3; color: white; }'
+        books_html += 'tr:hover { background-color: #f5f5f5; }'
+        books_html += 'h1 { color: #0056b3; }'
+        books_html += '</style>'
+        books_html += '</head>'
+        books_html += '<body>'
+        books_html += '<h1>Liste des Livres (DB)</h1>'
         books_html += '<table>'
         books_html += '<tr><th>ID</th><th>Title</th><th>Author</th><th>Description</th><th>Year</th><th>Quantity</th></tr>'
-        
         for book in books:
             books_html += '<tr>'
             books_html += f'<td>{book["id"]}</td>'
@@ -176,14 +229,12 @@ def get_books():
             books_html += f'<td>{book["year"]}</td>'
             books_html += f'<td>{book["quantity"] if book["quantity"] is not None else "Not specified"}</td>'
             books_html += '</tr>'
-        
         books_html += '</table>'
         books_html += '</body>'
         books_html += '</html>'
-
         return books_html
-    else:
-        return f'''
+
+    return '''
         <!DOCTYPE html>
         <html lang="fr">
         <head>
@@ -197,7 +248,7 @@ def get_books():
         </head>
         <body>
             <h1>Erreur</h1>
-            <p>{ERROR_DB_CONN_MSG}.</p>
+            <p>Aucune source de livres disponible (JSON ou DB).</p>
         </body>
         </html>
         ''', 500
