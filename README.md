@@ -1,144 +1,236 @@
 # Book Service API
 
+Service web Flask pour gérer une collection de livres, avec persistance SQLite, rendu HTML simple et API REST. Le projet inclut CORS (allow‑list), protection CSRF et gestion de `SECRET_KEY` via variables d'environnement. Un `Dockerfile` est fourni pour une exécution en production via Gunicorn avec un utilisateur non‑root. Un workflow GitHub Actions est disponible pour construire et pousser l'image Docker, générer un SBOM, lancer une analyse Sonar et scanner les vulnérabilités avec Trivy.
 
-# 1. Create a Docker Compose YAML File for a MySQL Docker Container
-
-Let’s create a directory nammed db-docker at the source of the project, and then create a docker-compose.yaml file in that directory.
-
-Basically, here, we will specify the services we are going to use and set up the environment variables related to those.
-Add the following in the docker-compose.yml file we just created:
-
-	version: '3'
-
-	services:
-
-	  mysql-development:
-	    image: mysql:8.0.17
-	    environment:
-	      MYSQL_ROOT_PASSWORD: helloworld
-	      MYSQL_DATABASE: testapp
-	    ports:
-	      - "3308:3306"
-
-
-We specified the name of our MySQL container as mysql-development and the Docker image to be used is mysql:8.0.17. Where if don’t specify the tag as 8.0.17, it will take the latest one.
-The next thing we need to specify is the environment variables, i.e. the user, password, and database. If you don’t specify the user, by default it will be root.
-We will use helloworld as password and testapp as database.
-Another important thing is port mapping. 3308:3306 means that the MySQL running in the container at port 3306 is mapped to the localhost of the host machine at port 3308. You can use a different port as well.
-Now, after creating the .yaml file, we need to run the following command in the same directory where the .yaml file is located:
-
-	docker-compose up
-
-This will pull the Docker image (if the image is not available locally, it will pull from Docker Hub) and then run the container.
-We can check the status with:
-
-	docker-compose ps
-
-This will show the name of the container, command, and state of the container, which shows, for example, that the container is running. It also shows port mapping.
-In the next step, we will connect to this MySQL container and run some commands.
-
-# 2. Connect to the MySQL Database Running in a Container
-
-We will discuss two methods to connect and run SQL commands on the MySQL running in a Docker container.
-The first method is to use tools like MySQL Workbench (DataGrip also can be used).
-As we now have a MySQL container running at our local machine’s port 3308, we can connect using the following configuration parameters (on SQL Workbench for exemple):
-
-	hostname : localhost
-	port : 3308
-	username : root
-	password : helloworld
-	default Schema : library
-
-The connection through the local machine’s port 3308 was only possible due to port mapping.
-If we want to connect to containerized MySQL, without mapping ports, i.e. from another application running on the same Docker network, we have to use tools like Adminer, which is our other method.
-
-Adminer is a PHP-based web application for accessing databases.
-Now, we will add another service for Adminer in our docker-compose.yml file. But, before we make changes here, we need to stop running the container and remove it with the following command:
-
-	docker-compose down
-
-Let’s add the following in our docker-compose.yaml file:
-
-	version: '3'
-
-	services:
-
-	  mysql-development:
-	    image: mysql:8.0.17
-	    environment:
-	      MYSQL_ROOT_PASSWORD: helloworld
-	      MYSQL_DATABASE: testapp
-	    ports:
-	      - "3308:3306"
-
-	  admin:    
-	    image: adminer    
-	    ports:      
-	      - "8080:8080"
-      
-      
-Now, let’s start the Docker containers again:
-
-	docker-compose up
-
-After running this, the image for Adminer will be pulled and the container for both MySQL and Adminer will be started.
-We can check this using docker-compose ps.
-Now, we can go to our browser and go to localhost:8080 for Adminer. As Adminer runs on the same Docker network as MySQL, it can access the MySQL container via port 3306 (or simply, by the container’s name).
-Note: We can’t access the MySQL container through port 3308 in Adminer, as this will try to access port 3308 of the Docker Compose network, not our local machine’s 3308 port.
-On the Adminer page, use theses parameters to connect :
-
-	System : MySQL
-	Server : mysql-development (or the name you choosed in the docker-compose.yaml 
-	Username : root
-	Password : helloworld
-	Database : testapp (or the name you choosed for the DATABASE)
-	
 ---
 
-## Configuration
+## Sommaire
+- **[Fonctionnalités](#fonctionnalités)**
+- **[Structure du projet](#structure-du-projet)**
+- **[Prérequis](#prérequis)**
+- **[Installation & démarrage en local](#installation--démarrage-en-local)**
+- **[Variables d'environnement](#variables-denvironnement)**
+- **[Exécution avec Docker](#exécution-avec-docker)**
+- **[API](#api)**
+- **[Exemples curl](#exemples-curl)**
+- **[Sécurité et bonnes pratiques](#sécurité-et-bonnes-pratiques)**
+- **[Intégration Continue (CI)](#intégration-continue-ci)**
+- **[Dépannage](#dépannage)**
 
-To comply with secure coding practices and SonarQube guidance, the Flask app must obtain its secret key from the environment.
+---
 
-- In production, `SECRET_KEY` is mandatory. The app will fail fast if it is missing.
-- In development, if `SECRET_KEY` is not provided, an ephemeral key is generated (or you can set `DEV_SECRET_KEY`).
+## Fonctionnalités
+- **Liste des livres** depuis `livres.json` si présent, sinon depuis la base **SQLite** `library.db`.
+- **CRUD** basique via endpoints REST: `GET`, `POST`, `PUT`, `DELETE`.
+- **Pages HTML** minimalistes pour `/`, `/books`, `/docs`.
+- **Endpoint de santé**: `/health`.
+- **Sécurité**: CSRF (Flask‑WTF), CORS avec allow‑list, secret Flask injecté via variables d'environnement.
 
-Recommended ways to set secrets:
+---
 
-- Store them in your platform’s secret manager (GitHub Actions, Docker/Kubernetes secrets, cloud provider KMS/Secret Manager).
-- Never commit secrets to source control.
+## Structure du projet
+- `main.py` — Application Flask, routes et logique (SQLite, gestion JSON, CORS/CSRF, env vars).
+- `requirements.txt` — Dépendances Python (Flask, Gunicorn, CORS, Flask‑WTF).
+- `Dockerfile` — Image Python 3.13, installation deps, lancement via Gunicorn en utilisateur non‑root.
+- `livres.json` — Données d'exemple optionnelles (prioritaires sur la DB pour l'affichage `/books`).
+- `library.db` — Base SQLite (créée et maintenue automatiquement).
+- `.github/workflows/build.yml` — Workflow CI pour build/push image Docker, SBOM, Sonar, Trivy.
+- `sonar-project.properties` — Clés SonarCloud du projet.
 
-### Local development (PowerShell)
+---
 
+## Prérequis
+- Python 3.11+ recommandé (l'image Docker utilise 3.13).
+- Pip/venv ou Docker installé.
+
+---
+
+## Installation & démarrage en local
+1. Créer un environnement virtuel (recommandé) et installer les dépendances:
+
+```bash
+pip install -r requirements.txt
+```
+
+2. (Optionnel) Définir une clé de développement stable:
+
+- PowerShell (Windows):
 ```powershell
-# Option A: ephemeral (no env var needed) — app prints a warning
-python .\main.py
+$env:DEV_SECRET_KEY = "<valeur-aleatoire-longue>"
+```
 
-# Option B: stable dev key
-$env:DEV_SECRET_KEY = "<long-random-value>"
+- Bash (Linux/macOS):
+```bash
+export DEV_SECRET_KEY="<valeur-aleatoire-longue>"
+```
+
+3. Lancer l'application:
+
+- PowerShell (Windows):
+```powershell
 python .\main.py
 ```
 
-### Docker run (production-like)
+- Bash (Linux/macOS):
+```bash
+python ./main.py
+```
 
+Par défaut, l'application écoute sur `http://127.0.0.1:5000`.
+
+---
+
+## Variables d'environnement
+- `SECRET_KEY` (prod, requis) — Clé secrète Flask. Si absente en production, l'app lève une erreur au démarrage.
+- `DEV_SECRET_KEY` (dev, optionnel) — Clé utilisée uniquement si `SECRET_KEY` est absente; évite d'avoir une clé codée en dur.
+- `FLASK_ENV` — `production` ou `development` (par défaut `development`). En `production`, `SECRET_KEY` est exigée.
+- `FLASK_DEBUG` — `1/true` pour activer le debug (à éviter en prod). Par défaut, activé seulement hors prod.
+- `ALLOWED_ORIGINS` — Liste de domaines autorisés pour CORS, séparés par virgules. Défaut: `http://localhost:3000,http://127.0.0.1:3000`.
+
+Exemples:
+```bash
+# Production-like
+export SECRET_KEY="<strong-secret>"
+export FLASK_ENV=production
+export ALLOWED_ORIGINS="https://mon-site.fr,https://app.example.com"
+```
+
+---
+
+## Exécution avec Docker
+
+### Construire l'image localement
+```bash
+docker build -t book-service:local .
+```
+
+### Lancer le conteneur
 ```bash
 docker run \
   -e SECRET_KEY="<strong-secret>" \
   -e FLASK_ENV=production \
+  -e ALLOWED_ORIGINS="http://localhost:3000" \
   -p 5000:5000 \
-  docker.io/<user>/book-service:<tag>
+  book-service:local
 ```
 
-### Docker Compose example
-
+### Exemple Docker Compose
 ```yaml
 services:
   book-service:
     image: docker.io/<user>/book-service:latest
     environment:
       FLASK_ENV: production
-      SECRET_KEY: ${SECRET_KEY}   # define in .env or your secret manager
+      SECRET_KEY: ${SECRET_KEY}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
     ports:
       - "5000:5000"
 ```
 
-If you use a `.env` file for Compose, ensure it is not committed to the repository.
+---
+
+## API
+- `GET /` — Page d'accueil HTML avec liens utiles.
+- `GET /health` — Statut `{status: "ok"}` ou code 503 si dégradé.
+- `GET /books` (alias: `/getBooks`) — Liste les livres. Si `livres.json` existe, il est utilisé; sinon fallback sur SQLite.
+- `POST /books` (alias: `/addBook`, `/addBooks`) — Ajoute un livre. Body JSON requis.
+- `PUT /books/<id>` (alias: `/updateBook/<id>`) — Met à jour un livre par ID. Body JSON requis.
+- `DELETE /books/<id>` (alias: `/deleteBook/<id>`) — Supprime un livre par ID.
+- `GET /docs` — Page HTML d'aide intégrée.
+
+Schéma JSON pour POST/PUT:
+```json
+{
+  "title": "string",
+  "author": "string",
+  "description": "string (optionnel)",
+  "year": 2024,
+  "quantity": 10
+}
+```
+
+Règles de validation: `title`, `author`, `year`, `quantity` sont requis; en cas d'absence → 400.
+
+---
+
+## Exemples curl
+- GET livres:
+```bash
+curl -i http://127.0.0.1:5000/books
+```
+
+- POST livre:
+```bash
+curl -i -X POST http://127.0.0.1:5000/books \
+  -H "Content-Type: application/json" \
+  -d '{
+        "title":"Nouveau Livre",
+        "author":"Auteur",
+        "description":"Optionnel",
+        "year":2024,
+        "quantity":5
+      }'
+```
+
+- PUT livre:
+```bash
+curl -i -X PUT http://127.0.0.1:5000/books/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+        "title":"Titre MAJ",
+        "author":"Auteur MAJ",
+        "description":"Desc MAJ",
+        "year":2023,
+        "quantity":7
+      }'
+```
+
+- DELETE livre:
+```bash
+curl -i -X DELETE http://127.0.0.1:5000/books/1
+```
+
+---
+
+## Sécurité et bonnes pratiques
+- **CSRF**: `Flask-WTF`/`CSRFProtect` est initialisé dans `main.py`. Les vues API JSON sont protégées côté serveur.
+- **CORS**: `flask-cors` avec allow‑list. Configurez `ALLOWED_ORIGINS` pour vos domaines front.
+- **Secret Key**: pas de valeur codée en dur. En prod, `SECRET_KEY` est obligatoire. En dev, si absent, une clé éphémère est générée (warning en console) ou définissez `DEV_SECRET_KEY`.
+- **Non‑root en conteneur**: l'image exécute Gunicorn sous un utilisateur dédié `appuser`.
+- **Debug**: le debug Flask n'est jamais activé par défaut en prod. Respect de `FLASK_DEBUG` uniquement si explicitement défini.
+
+---
+
+## Intégration Continue (CI)
+Workflow: `.github/workflows/build.yml`
+
+- **Déclencheur**: `push` sur la branche `master`.
+- **Étapes principales**:
+  - Checkout du code (`actions/checkout@v4`).
+  - Build & push de l'image Docker (`docker/build-push-action@v5`) vers Docker Hub avec tag `docker.io/${{ secrets.DOCKER_USERNAME }}/book-service:${{ github.sha }}`.
+  - **SBOM**: génération via `anchore/sbom-action@v0` (format SPDX JSON).
+  - **Sonar**: scan avec `SonarSource/sonarqube-scan-action@v5` (nécessite `SONAR_TOKEN`).
+  - **Sécurité**: scan de vulnérabilités image avec `aquasecurity/trivy-action` (HIGH/CRITICAL rapportés).
+
+Secrets requis côté repo:
+- `DOCKER_USERNAME`, `DOCKER_PASSWORD`
+- `SONAR_TOKEN`
+
+Configuration Sonar (`sonar-project.properties`):
+- `sonar.projectKey=ISEN-2020_book-service`
+- `sonar.organization=isen-2020`
+
+---
+
+## Dépannage
+- **`SECRET_KEY must be set in production`**: définissez `SECRET_KEY` et `FLASK_ENV=production` correctement (ou utilisez `DEV_SECRET_KEY` en dev).
+- **CORS bloqué**: ajoutez votre origine à `ALLOWED_ORIGINS` (ex: `http://localhost:3000`).
+- **Base SQLite vide**: la table est créée automatiquement au démarrage. Ajoutez des livres via `POST /books` ou placez un `livres.json` valide pour lister.
+- **Port déjà utilisé**: changez le mapping `-p 5000:5000` côté Docker ou libérez le port local.
+- **Échec CI Docker push**: vérifiez `DOCKER_USERNAME/DOCKER_PASSWORD` et vos droits sur Docker Hub.
+- **Échec Sonar**: vérifiez `SONAR_TOKEN` et les clés `projectKey/organization`.
+
+---
+
+## Licence
+Indiquez ici la licence du projet (par ex. MIT). Si non précisé, ajoutez un fichier `LICENSE`.
