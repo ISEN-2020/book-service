@@ -150,14 +150,14 @@ def get_books():
         books_html += '<tr><th>ID</th><th>Title</th><th>Author</th><th>Description</th><th>Year</th><th>Quantity</th></tr>'
         
         for book in books:
-            books_html += f'<tr>'
+            books_html += '<tr>'
             books_html += f'<td>{book["id"]}</td>'
             books_html += f'<td>{book["title"]}</td>'
             books_html += f'<td>{book["author"]}</td>'
             books_html += f'<td>{book["description"] if book["description"] else "No description available"}</td>'
             books_html += f'<td>{book["year"]}</td>'
             books_html += f'<td>{book["quantity"] if book["quantity"] is not None else "Not specified"}</td>'
-            books_html += f'</tr>'
+            books_html += '</tr>'
         
         books_html += '</table>'
         books_html += '</body>'
