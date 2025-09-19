@@ -7,12 +7,12 @@
       "start": "node index.js"
     },
     "dependencies": {
-      "express": "4.16.4",
-      "lodash": "4.17.20"
+      "express": "^4.19.2",
+      "lodash": "^4.17.21"
     },
     "engines": {
       "node": ">=10.0.0"
     },
-    "author": "Allan",
+    "author": "Corentin_Lucas",
     "license": "MIT"
   }
