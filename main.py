@@ -3,10 +3,17 @@ from flask_cors import CORS
 from flask_wtf import CSRFProtect
 import sqlite3
 import os
+import secrets
 
 app = Flask(__name__)
-# CSRF protection (SonarQube compliant). SECRET_KEY should be set via env in production
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'change-me-in-prod')
+# CSRF protection (SonarQube compliant). SECRET_KEY must come from env.
+# No hard-coded default; for development, an ephemeral key is generated if missing.
+_secret = os.getenv('SECRET_KEY')
+if not _secret:
+    # Optional dev override; avoids hard-coding in source control
+    _secret = os.getenv('DEV_SECRET_KEY') or secrets.token_urlsafe(32)
+    print("WARNING: SECRET_KEY not set; using ephemeral key (development only).")
+app.config['SECRET_KEY'] = _secret
 csrf = CSRFProtect()
 csrf.init_app(app)
 # Configure CORS with an allow-list (no wildcard) to satisfy security best practices
