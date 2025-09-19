@@ -6,7 +6,7 @@ WORKDIR /app
  
 # Copier le fichier requirements.txt (que nous allons créer) et installer les dépendances
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
  
 # Copier uniquement les fichiers nécessaires à l'exécution
 COPY main.py ./
