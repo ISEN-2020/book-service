@@ -56,7 +56,7 @@ jobs:
           exit-code: '1'               # Échec du job si vulnérabilités CRITICAL/HIGH
           ignore-unfixed: true
           vuln-type: 'os,library'
-          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+          severity: 'HIGH,CRITICAL'
 
       # # Étape 9 : Analyse OWASP Dependency Check (désactivée)
       # - uses: 3r1co/dependency-check-action@master
