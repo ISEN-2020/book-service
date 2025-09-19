@@ -1,1 +1,23 @@
-[{"title": "1984","author": "George Orwell","year": 1949,"description": "Dystopian novel"},{"title": "To Kill a Mockingbird","author": "Harper Lee","year": 1960,"description": "Novel about racism and injustice"}]
+[
+    {"title": "1984","author": "George Orwell","year": 1949,"description": "Dystopian novel"},
+    {"title": "To Kill a Mockingbird","author": "Harper Lee","year": 1960,"description": "Novel about racism and injustice"},
+    {"title": "Brave New World","author": "Aldous Huxley","year": 1932,"description": "Dystopian novel about a futuristic society"},
+    {"title": "The Great Gatsby","author": "F. Scott Fitzgerald","year": 1925,"description": "Novel about the American dream"},
+    {"title": "Moby Dick","author": "Herman Melville","year": 1851,"description": "Epic tale of a whale hunt"},
+    {"title": "Pride and Prejudice","author": "Jane Austen","year": 1813,"description": "Classic romance and social commentary"},
+    {"title": "War and Peace","author": "Leo Tolstoy","year": 1869,"description": "Historical novel of Napoleonic era"},
+    {"title": "The Catcher in the Rye","author": "J.D. Salinger","year": 1951,"description": "Story of teenage angst and rebellion"},
+    {"title": "The Hobbit","author": "J.R.R. Tolkien","year": 1937,"description": "Fantasy adventure in Middle-earth"},
+    {"title": "Fahrenheit 451","author": "Ray Bradbury","year": 1953,"description": "Dystopian novel about censorship"},
+    {"title": "Jane Eyre","author": "Charlotte Brontë","year": 1847,"description": "Gothic romance and coming-of-age story"},
+    {"title": "The Odyssey","author": "Homer","year": -800,"description": "Epic Greek poem of Odysseus' journey"},
+    {"title": "Frankenstein","author": "Mary Shelley","year": 1818,"description": "Science fiction horror about a monster"},
+    {"title": "The Lord of the Rings","author": "J.R.R. Tolkien","year": 1954,"description": "Epic fantasy trilogy"},
+    {"title": "Animal Farm","author": "George Orwell","year": 1945,"description": "Political allegory about a farm"},
+    {"title": "The Brothers Karamazov","author": "Fyodor Dostoevsky","year": 1880,"description": "Philosophical novel exploring morality"},
+    {"title": "Les Misérables","author": "Victor Hugo","year": 1862,"description": "Historical novel of justice and redemption"},
+    {"title": "Dracula","author": "Bram Stoker","year": 1897,"description": "Gothic horror novel introducing Count Dracula"},
+    {"title": "The Kite Runner","author": "Khaled Hosseini","year": 2003,"description": "Story of friendship and redemption in Afghanistan"},
+    {"title": "Harry Potter and the Sorcerer's Stone","author": "J.K. Rowling","year": 1997,"description": "First book in the Harry Potter fantasy series"}
+  ]
+  
