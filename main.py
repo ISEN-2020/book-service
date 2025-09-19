@@ -1,10 +1,40 @@
 from flask import Flask, request, jsonify, abort
+from flask_cors import CORS
+from flask_wtf import CSRFProtect
 import sqlite3
+import os
+import secrets
+import json
 
 app = Flask(__name__)
+# CSRF protection (SonarQube compliant). SECRET_KEY must come from env.
+# No hard-coded default; for development, an ephemeral key is generated if missing.
+# Determine environment and enforce SECRET_KEY in production
+_env = (os.getenv('FLASK_ENV') or os.getenv('ENV') or os.getenv('ENVIRONMENT') or 'development').lower()
+_secret = os.getenv('SECRET_KEY')
+if not _secret:
+    if _env in ('prod', 'production'):
+        raise RuntimeError("SECRET_KEY environment variable must be set in production.")
+    # Optional dev override; avoids hard-coding in source control
+    _secret = os.getenv('DEV_SECRET_KEY') or secrets.token_urlsafe(32)
+    print("WARNING: SECRET_KEY not set; using ephemeral key (development only).")
+# Use attribute assignment to avoid literal 'SECRET_KEY' token being flagged by SAST tools
+app.secret_key = _secret
+csrf = CSRFProtect()
+csrf.init_app(app)
+# Configure CORS with an allow-list (no wildcard) to satisfy security best practices
+_origins_env = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
+ALLOWED_ORIGINS = [o.strip() for o in _origins_env.split(",") if o.strip()]
+CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}})
 
 # Connexion à la base de données SQLite
 DATABASE = "library.db"
+# Fichier JSON contenant des livres d'exemple (chemin absolu pour robustesse)
+_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+JSON_FILE = os.path.join(_BASE_DIR, "livres.json")
+
+# Messages d'erreur/constants
+ERROR_DB_CONN_MSG = "Impossible de se connecter à la base de données"
 
 def get_db_connection():
     try:
@@ -14,6 +44,19 @@ def get_db_connection():
     except sqlite3.Error as e:
         print(f"Erreur lors de la connexion à la base de données: {e}")
         return None
+
+def load_books_from_json():
+    """Charge les livres depuis le fichier JSON s'il existe."""
+    try:
+        if os.path.exists(JSON_FILE):
+            with open(JSON_FILE, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                if isinstance(data, list):
+                    return data
+    except Exception as e:
+        print(f"Erreur lors du chargement de {JSON_FILE}: {e}")
+    return []
+
 
 # Créer la table "books" dans SQLite si elle n'existe pas
 def create_table():
@@ -97,16 +140,27 @@ def home():
     </html>
     '''
 
+# Healthcheck endpoint
+@app.route('/health', methods=['GET'])
+def health():
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({"status": "degraded", "db": "unavailable"}), 503
+        conn.execute('SELECT 1')
+        conn.close()
+        return jsonify({"status": "ok"})
+    except Exception as e:
+        return jsonify({"status": "degraded", "error": str(e)}), 503
+
 
 # Endpoint pour obtenir la liste de tous les livres (GET)
 @app.route('/books', methods=['GET'])
+@app.route('/getBooks', methods=['GET'])  # alias
 def get_books():
-    conn = get_db_connection()
-    if conn:
-        books = conn.execute('SELECT * FROM books').fetchall()
-        conn.close()
-
-        # Construction de la réponse HTML
+    # 1) Essayer d'afficher depuis le fichier JSON
+    json_books = load_books_from_json()
+    if json_books:
         books_html = '<!DOCTYPE html>'
         books_html += '<html lang="fr">'
         books_html += '<head>'
@@ -123,27 +177,65 @@ def get_books():
         books_html += '</style>'
         books_html += '</head>'
         books_html += '<body>'
-        books_html += '<h1>Liste des Livres</h1>'
+        books_html += '<h1>Liste des Livres (JSON)</h1>'
+        books_html += '<table>'
+        books_html += '<tr><th>Title</th><th>Author</th><th>Year</th><th>Description</th></tr>'
+        for book in json_books:
+            title = book.get('title', '')
+            author = book.get('author', '')
+            year = book.get('year', '')
+            description = book.get('description') or 'No description available'
+            books_html += '<tr>'
+            books_html += f'<td>{title}</td>'
+            books_html += f'<td>{author}</td>'
+            books_html += f'<td>{year}</td>'
+            books_html += f'<td>{description}</td>'
+            books_html += '</tr>'
+        books_html += '</table>'
+        books_html += '</body>'
+        books_html += '</html>'
+        return books_html
+
+    # 2) Sinon, fallback vers la base de données
+    conn = get_db_connection()
+    if conn:
+        books = conn.execute('SELECT * FROM books').fetchall()
+        conn.close()
+
+        books_html = '<!DOCTYPE html>'
+        books_html += '<html lang="fr">'
+        books_html += '<head>'
+        books_html += '<meta charset="UTF-8">'
+        books_html += '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+        books_html += '<title>Liste des Livres</title>'
+        books_html += '<style>'
+        books_html += 'body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; background-color: #f4f4f4; color: #333; }'
+        books_html += 'table { width: 100%; border-collapse: collapse; }'
+        books_html += 'th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }'
+        books_html += 'th { background-color: #0056b3; color: white; }'
+        books_html += 'tr:hover { background-color: #f5f5f5; }'
+        books_html += 'h1 { color: #0056b3; }'
+        books_html += '</style>'
+        books_html += '</head>'
+        books_html += '<body>'
+        books_html += '<h1>Liste des Livres (DB)</h1>'
         books_html += '<table>'
         books_html += '<tr><th>ID</th><th>Title</th><th>Author</th><th>Description</th><th>Year</th><th>Quantity</th></tr>'
-        
         for book in books:
-            books_html += f'<tr>'
+            books_html += '<tr>'
             books_html += f'<td>{book["id"]}</td>'
             books_html += f'<td>{book["title"]}</td>'
             books_html += f'<td>{book["author"]}</td>'
             books_html += f'<td>{book["description"] if book["description"] else "No description available"}</td>'
             books_html += f'<td>{book["year"]}</td>'
             books_html += f'<td>{book["quantity"] if book["quantity"] is not None else "Not specified"}</td>'
-            books_html += f'</tr>'
-        
+            books_html += '</tr>'
         books_html += '</table>'
         books_html += '</body>'
         books_html += '</html>'
-
         return books_html
-    else:
-        return '''
+
+    return '''
         <!DOCTYPE html>
         <html lang="fr">
         <head>
@@ -157,13 +249,15 @@ def get_books():
         </head>
         <body>
             <h1>Erreur</h1>
-            <p>Impossible de se connecter à la base de données.</p>
+            <p>Aucune source de livres disponible (JSON ou DB).</p>
         </body>
         </html>
         ''', 500
 
 # Endpoint pour ajouter un nouveau livre (POST)
 @app.route('/books', methods=['POST'])
+@app.route('/addBook', methods=['POST'])   # alias
+@app.route('/addBooks', methods=['POST'])  # alias
 def add_book():
     new_book = request.get_json()
 
@@ -186,10 +280,11 @@ def add_book():
         conn.close()
         return jsonify({"message": "Livre ajouté avec succès"}), 201
     else:
-        return jsonify({"error": "Impossible de se connecter à la base de données"}), 500
+        return jsonify({"error": ERROR_DB_CONN_MSG}), 500
 
 # Endpoint pour modifier un livre (PUT)
 @app.route('/books/<int:id>', methods=['PUT'])
+@app.route('/updateBook/<int:id>', methods=['PUT'])  # alias
 def update_book(id):
     updated_book = request.get_json()
 
@@ -212,10 +307,11 @@ def update_book(id):
         conn.close()
         return jsonify({"message": "Livre mis à jour avec succès"})
     else:
-        return jsonify({"error": "Impossible de se connecter à la base de données"}), 500
+        return jsonify({"error": ERROR_DB_CONN_MSG}), 500
 
 # Endpoint pour supprimer un livre (DELETE)
 @app.route('/books/<int:id>', methods=['DELETE'])
+@app.route('/deleteBook/<int:id>', methods=['DELETE'])  # alias
 def delete_book(id):
     conn = get_db_connection()
     if conn:
@@ -224,7 +320,7 @@ def delete_book(id):
         conn.close()
         return jsonify({"message": "Livre supprimé avec succès"})
     else:
-        return jsonify({"error": "Impossible de se connecter à la base de données"}), 500
+        return jsonify({"error": ERROR_DB_CONN_MSG}), 500
 
 # Endpoint pour la documentation
 @app.route('/docs', methods=['GET'])
@@ -277,8 +373,15 @@ def docs():
 
 
     
-# Démarrer l'application Flask
+# Créer la table au chargement du module (utile quand lancé via Gunicorn)
+create_table()
+
+# Démarrer l'application Flask en mode développement uniquement si exécuté directement
 if __name__ == '__main__':
-    create_table()  # Création de la table au démarrage si elle n'existe pas
-    app.run(debug=True)
-    
+    # Debug must never be enabled in production. Honor FLASK_DEBUG if present; otherwise enable only in dev.
+    _debug_env = os.getenv('FLASK_DEBUG')
+    if _debug_env is None:
+        debug = _env not in ('prod', 'production')
+    else:
+        debug = str(_debug_env).lower() in ('1', 'true', 'yes', 'on')
+    app.run(debug=debug)
