@@ -8,8 +8,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
  
-# Copier tout le contenu du projet dans le répertoire de travail
-COPY . .
+# Copier uniquement les fichiers nécessaires à l'exécution
+COPY main.py ./
  
 # Exposer le port 5000 (le port par défaut utilisé par Uvicorn)
 EXPOSE 5000
