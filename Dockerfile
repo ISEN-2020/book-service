@@ -14,5 +14,8 @@ COPY . .
 # Exposer le port 5000 (le port par défaut utilisé par Uvicorn)
 EXPOSE 5000
  
-# Démarrer l'application avec Uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+# Démarrer l'application Flask avec Gunicorn
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "main:app"]

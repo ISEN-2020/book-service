@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify, abort
+from flask_cors import CORS
 import sqlite3
 
 app = Flask(__name__)
+CORS(app)
 
 # Connexion à la base de données SQLite
 DATABASE = "library.db"
@@ -96,6 +98,19 @@ def home():
     </body>
     </html>
     '''
+
+# Healthcheck endpoint
+@app.route('/health', methods=['GET'])
+def health():
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({"status": "degraded", "db": "unavailable"}), 503
+        conn.execute('SELECT 1')
+        conn.close()
+        return jsonify({"status": "ok"})
+    except Exception as e:
+        return jsonify({"status": "degraded", "error": str(e)}), 503
 
 
 # Endpoint pour obtenir la liste de tous les livres (GET)
@@ -277,8 +292,10 @@ def docs():
 
 
     
-# Démarrer l'application Flask
+# Créer la table au chargement du module (utile quand lancé via Gunicorn)
+create_table()
+
+# Démarrer l'application Flask en mode développement uniquement si exécuté directement
 if __name__ == '__main__':
-    create_table()  # Création de la table au démarrage si elle n'existe pas
     app.run(debug=True)
     
