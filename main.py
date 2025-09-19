@@ -1,9 +1,14 @@
 from flask import Flask, request, jsonify, abort
 from flask_cors import CORS
+from flask_wtf import CSRFProtect
 import sqlite3
 import os
 
 app = Flask(__name__)
+# CSRF protection (SonarQube compliant). SECRET_KEY should be set via env in production
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'change-me-in-prod')
+csrf = CSRFProtect()
+csrf.init_app(app)
 # Configure CORS with an allow-list (no wildcard) to satisfy security best practices
 _origins_env = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
 ALLOWED_ORIGINS = [o.strip() for o in _origins_env.split(",") if o.strip()]
